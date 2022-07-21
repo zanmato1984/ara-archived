@@ -1,1 +1,1 @@
-export PATH=/opt/homebrew/Caskroom/miniconda/base/envs/ara-dev:$PATH
+conda activate ara-dev
