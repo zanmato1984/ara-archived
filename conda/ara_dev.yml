@@ -1,0 +1,10 @@
+name: ara-dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - cmake
+  - arrow-cpp>=8.0
+  - rapidjson
+  - gtest
+  - gmock
