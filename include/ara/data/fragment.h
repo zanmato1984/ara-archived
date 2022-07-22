@@ -4,13 +4,13 @@
 
 #include <algorithm>
 
-namespace cura::data {
+namespace ara::data {
 
 struct ColumnScalar;
 struct ColumnVector;
 
-using cura::expression::ColumnIdx;
-using cura::type::Schema;
+using ara::expression::ColumnIdx;
+using ara::type::Schema;
 
 struct Fragment {
   explicit Fragment(std::vector<std::shared_ptr<const Column>> columns_);
@@ -28,7 +28,7 @@ struct Fragment {
     if (auto cc = std::dynamic_pointer_cast<const T>(columns[idx]); cc) {
       return cc;
     }
-    CURA_FAIL("Required concrete column is invalid");
+    ARA_FAIL("Required concrete column is invalid");
   }
 
   template <typename T, std::enable_if_t<std::is_same_v<T, Column>> * = nullptr>
@@ -47,4 +47,4 @@ private:
   std::vector<std::shared_ptr<const Column>> columns;
 };
 
-} // namespace cura::data
+} // namespace ara::data

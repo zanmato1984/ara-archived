@@ -2,7 +2,7 @@
 
 #include "ara/expression/expressions.h"
 
-namespace cura::expression {
+namespace ara::expression {
 
 #define APPLY_FOR_TI_UNARY_OPERATORS(ACTION) ACTION(EXTRACT_YEAR, extract_year)
 
@@ -44,4 +44,4 @@ private:
   UnaryOperator unary_operator;
 };
 
-} // namespace cura::expression
+} // namespace ara::expression

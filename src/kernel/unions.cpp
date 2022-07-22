@@ -8,13 +8,13 @@
 #include <numeric>
 #include <unordered_set>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::data::Column;
-using cura::data::ColumnVector;
-using cura::data::createArrowColumnVector;
-using cura::type::DataType;
-using cura::type::Schema;
+using ara::data::Column;
+using ara::data::ColumnVector;
+using ara::data::createArrowColumnVector;
+using ara::type::DataType;
+using ara::type::Schema;
 
 void Union::push(const Context &ctx, ThreadId thread_id, KernelId upstream,
                  std::shared_ptr<const Fragment> fragment) const {
@@ -49,26 +49,26 @@ struct UnionTypeVisitor : public arrow::TypeVisitor {
     auto pool = arrow::default_memory_pool();
     std::unique_ptr<arrow::ArrayBuilder> builder;
     {
-      CURA_ASSERT_ARROW_OK(
+      ARA_ASSERT_ARROW_OK(
           arrow::MakeBuilder(pool, data_type.arrow(), &builder),
           "Creating arrow column builder failed");
     }
     auto type_builder = dynamic_cast<BuilderType *>(builder.get());
-    CURA_ASSERT(type_builder, "Cast to concrete builder failed");
+    ARA_ASSERT(type_builder, "Cast to concrete builder failed");
     for (const auto &row : set) {
       auto scalar = row.at(column_id);
       auto type_scalar = std::dynamic_pointer_cast<ScalarType>(scalar);
       if (type_scalar->is_valid) {
-        CURA_ASSERT_ARROW_OK((Append<Type, BuilderType, ScalarType>(
+        ARA_ASSERT_ARROW_OK((Append<Type, BuilderType, ScalarType>(
                                  type_builder, type_scalar.get())),
                              "Append scalar failed");
       } else {
-        CURA_ASSERT_ARROW_OK(type_builder->AppendNull(),
+        ARA_ASSERT_ARROW_OK(type_builder->AppendNull(),
                              "Append scalar failed");
       }
     }
     std::shared_ptr<arrow::Array> array;
-    CURA_ASSERT_ARROW_OK(type_builder->Finish(&array),
+    ARA_ASSERT_ARROW_OK(type_builder->Finish(&array),
                          "Build arrow array failed");
     cv = createArrowColumnVector(data_type, array);
     return arrow::Status::OK();
@@ -167,7 +167,7 @@ std::shared_ptr<Fragment> doUnion(const Context &ctx, const Schema &schema,
     std::vector<std::shared_ptr<arrow::Scalar>> key;
     for (size_t i = 0; i < fragment->numColumns(); i++) {
       const auto &scalar =
-          CURA_GET_ARROW_RESULT(fragment->column(i)->arrow()->GetScalar(row));
+          ARA_GET_ARROW_RESULT(fragment->column(i)->arrow()->GetScalar(row));
       key.emplace_back(scalar);
     }
     set.emplace(std::move(key));
@@ -177,7 +177,7 @@ std::shared_ptr<Fragment> doUnion(const Context &ctx, const Schema &schema,
   for (size_t i = 0; i < fragment->numColumns(); i++) {
     const auto &data_type = fragment->column(i)->dataType();
     UnionTypeVisitor visitor(data_type, set, i);
-    CURA_ASSERT_ARROW_OK(data_type.arrow()->Accept(&visitor),
+    ARA_ASSERT_ARROW_OK(data_type.arrow()->Accept(&visitor),
                          "Copy row from set failed");
     converged_columns.emplace_back(std::move(visitor.cv));
   }
@@ -213,4 +213,4 @@ UnionAll::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
   return fragment;
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel

@@ -2,7 +2,7 @@
 
 #include "ara/kernel/aggregate.h"
 
-namespace cura::kernel::detail {
+namespace ara::kernel::detail {
 
 std::shared_ptr<Fragment>
 doAggregate(const Context &ctx, const Schema &schema,

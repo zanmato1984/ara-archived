@@ -2,19 +2,19 @@
 #include "ara/data/column_vector.h"
 #include "extract_year.h"
 
-namespace cura::expression {
+namespace ara::expression {
 
-using cura::data::ColumnVector;
+using ara::data::ColumnVector;
 
 std::string TiUnaryOp::unaryOperatorToString(UnaryOperator op) {
 #define UNARY_OP_CASE(OP, PRETTY)                                              \
   case UnaryOperator::OP:                                                      \
-    return CURA_STRINGIFY(OP);
+    return ARA_STRINGIFY(OP);
 
   switch (op) {
     APPLY_FOR_TI_UNARY_OPERATORS(UNARY_OP_CASE);
   default:
-    CURA_FAIL("Unknown ti unary op " +
+    ARA_FAIL("Unknown ti unary op " +
               std::to_string(static_cast<int32_t>(op)));
   }
 
@@ -24,12 +24,12 @@ std::string TiUnaryOp::unaryOperatorToString(UnaryOperator op) {
 std::string TiUnaryOp::unaryOperatorPretty(UnaryOperator op) {
 #define UNARY_OP_CASE(OP, PRETTY)                                              \
   case UnaryOperator::OP:                                                      \
-    return CURA_STRINGIFY(PRETTY);
+    return ARA_STRINGIFY(PRETTY);
 
   switch (op) {
     APPLY_FOR_TI_UNARY_OPERATORS(UNARY_OP_CASE);
   default:
-    CURA_FAIL("Unknown ti unary op " +
+    ARA_FAIL("Unknown ti unary op " +
               std::to_string(static_cast<int32_t>(op)));
   }
 
@@ -39,13 +39,13 @@ std::string TiUnaryOp::unaryOperatorPretty(UnaryOperator op) {
 TiUnaryOp::UnaryOperator
 TiUnaryOp::unaryOperatorFromString(const std::string &s) {
 #define UNARY_OP_CASE(OP, PRETTY)                                              \
-  if (s == CURA_STRINGIFY(OP)) {                                               \
+  if (s == ARA_STRINGIFY(OP)) {                                               \
     return UnaryOperator::OP;                                                  \
   }
 
   APPLY_FOR_TI_UNARY_OPERATORS(UNARY_OP_CASE)
 
-  CURA_FAIL("Invalid ti unary operator: " + s);
+  ARA_FAIL("Invalid ti unary operator: " + s);
 
 #undef UNARY_OP_CASE
 }
@@ -61,7 +61,7 @@ std::shared_ptr<const Column> dispatchTiUnaryOperator(
     return extractYear(ctx, thread_id, std::forward<OperandColumn>(operand),
                        result_type);
   default:
-    CURA_FAIL("Unimplemented");
+    ARA_FAIL("Unimplemented");
   }
 }
 
@@ -75,10 +75,10 @@ dispatchTiUnaryOpColumn(const Context &ctx, ThreadId thread_id,
     return dispatchTiUnaryOperator(ctx, thread_id, operand_cv, unary_operator,
                                    result_type);
   } else {
-    CURA_FAIL("Unimplemented");
+    ARA_FAIL("Unimplemented");
   }
 
-  CURA_FAIL("Shouldn't reach here");
+  ARA_FAIL("Shouldn't reach here");
 }
 
 std::shared_ptr<const Column>
@@ -96,10 +96,10 @@ std::shared_ptr<const Column>
 TiUnaryOp::evaluate(const Context &ctx, ThreadId thread_id,
                     const Fragment &fragment) const {
   auto operand = operands_[0]->evaluate(ctx, thread_id, fragment);
-  CURA_ASSERT(operand, "Operand column of unary op is null");
+  ARA_ASSERT(operand, "Operand column of unary op is null");
 
   return detail::evaluateTiUnaryOp(ctx, thread_id, operand, unary_operator,
                                    data_type);
 }
 
-} // namespace cura::expression
+} // namespace ara::expression

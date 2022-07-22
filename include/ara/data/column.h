@@ -2,9 +2,9 @@
 
 #include "ara/type/data_type.h"
 
-namespace cura::data {
+namespace ara::data {
 
-using cura::type::DataType;
+using ara::type::DataType;
 
 struct Column {
   Column(DataType data_type_) : data_type(std::move(data_type_)) {}
@@ -19,4 +19,4 @@ protected:
   DataType data_type;
 };
 
-} // namespace cura::data
+} // namespace ara::data

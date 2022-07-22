@@ -3,7 +3,7 @@
 
 #include <memory>
 
-namespace cura::type {
+namespace ara::type {
 
 namespace detail {
 
@@ -119,7 +119,7 @@ struct DataTypeTypeVisitor : public arrow::TypeVisitor {
 
 TypeId fromArrowType(std::shared_ptr<arrow::DataType> data_type) {
   DataTypeTypeVisitor visitor;
-  CURA_ASSERT_ARROW_OK(data_type->Accept(&visitor),
+  ARA_ASSERT_ARROW_OK(data_type->Accept(&visitor),
                        "Get type ID from arrow data type failed");
   return visitor.type_id;
 }
@@ -192,4 +192,4 @@ std::shared_ptr<arrow::DataType> DataType::arrow() const {
   return detail::toArrowType(type_id);
 }
 
-} // namespace cura::type
+} // namespace ara::type

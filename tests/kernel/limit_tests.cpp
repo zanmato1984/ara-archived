@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-using cura::VoidKernelId;
-using cura::kernel::Limit;
-using cura::test::data::makeDirectColumnVectorN;
-using cura::test::data::makeFragment;
-using cura::type::DataType;
-using cura::type::TypeId;
+using ara::VoidKernelId;
+using ara::kernel::Limit;
+using ara::test::data::makeDirectColumnVectorN;
+using ara::test::data::makeFragment;
+using ara::type::DataType;
+using ara::type::TypeId;
 
 TEST(LimitTest, SingleFragmentLess) {
   Option option;

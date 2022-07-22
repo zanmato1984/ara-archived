@@ -6,12 +6,12 @@
 #include <algorithm>
 #include <arrow/compute/api.h>
 
-namespace cura::expression {
+namespace ara::expression {
 
-using cura::data::ColumnScalar;
-using cura::data::ColumnVector;
-using cura::data::createArrowColumnVector;
-using cura::type::TypeId;
+using ara::data::ColumnScalar;
+using ara::data::ColumnVector;
+using ara::data::createArrowColumnVector;
+using ara::type::TypeId;
 
 namespace detail {
 
@@ -112,7 +112,7 @@ struct LeftTypeVisitor : public BinaryOpHolder<LeftColumn, RightColumn, Op> {
     RightTypeVisitor<LeftArrowType, LeftColumn, RightColumn, Op> right_visitor(
         this->ctx, this->thread_id, std::forward<LeftColumn>(this->left),
         std::forward<RightColumn>(this->right), std::forward<Op>(this->op));
-    CURA_ASSERT_ARROW_OK(
+    ARA_ASSERT_ARROW_OK(
         this->right->dataType().arrow()->Accept(&right_visitor),
         "Dispatch right type for binary op failed");
     this->cv = std::move(right_visitor.cv);
@@ -187,7 +187,7 @@ dispatchDualTypes(const Context &ctx, ThreadId thread_id, LeftColumn &&left,
   detail::LeftTypeVisitor<LeftColumn, RightColumn, Op> left_visitor(
       ctx, thread_id, std::forward<LeftColumn>(left),
       std::forward<RightColumn>(right), std::forward<Op>(op));
-  CURA_ASSERT_ARROW_OK(left->dataType().arrow()->Accept(&left_visitor),
+  ARA_ASSERT_ARROW_OK(left->dataType().arrow()->Accept(&left_visitor),
                        "Dispatch for binary op failed");
   return std::move(left_visitor.cv);
 }
@@ -202,16 +202,16 @@ std::shared_ptr<const Column> add(const Context &ctx, ThreadId thread_id,
       ctx.memory_resource->preConcatenate(thread_id));
   // Cast to result type as arrow doesn't support adding different types
   // regardless of implicit cast-able-ness.
-  const auto &left_casted = CURA_GET_ARROW_RESULT(
+  const auto &left_casted = ARA_GET_ARROW_RESULT(
       arrow::compute::Cast(left->arrow(), result_type.arrow(),
                            arrow::compute::CastOptions::Safe(), &context));
-  const auto &right_casted = CURA_GET_ARROW_RESULT(
+  const auto &right_casted = ARA_GET_ARROW_RESULT(
       arrow::compute::Cast(right->arrow(), result_type.arrow(),
                            arrow::compute::CastOptions::Safe(), &context));
-  const auto &res = CURA_GET_ARROW_RESULT(
+  const auto &res = ARA_GET_ARROW_RESULT(
       arrow::compute::Add(left_casted, right_casted,
                           arrow::compute::ArithmeticOptions(), &context));
-  CURA_ASSERT(res.kind() == arrow::Datum::ARRAY,
+  ARA_ASSERT(res.kind() == arrow::Datum::ARRAY,
               "Binary op result must be an arrow array");
   return createArrowColumnVector(result_type, res.make_array());
 }
@@ -228,10 +228,10 @@ struct Compare {
              RightColumn &&right) const {
     arrow::compute::ExecContext context(
         ctx.memory_resource->preConcatenate(thread_id));
-    const auto &res = CURA_GET_ARROW_RESULT(arrow::compute::Compare(
+    const auto &res = ARA_GET_ARROW_RESULT(arrow::compute::Compare(
         left->arrow(), right->arrow(),
         arrow::compute::CompareOptions(compareOp), &context));
-    CURA_ASSERT(res.kind() == arrow::Datum::ARRAY,
+    ARA_ASSERT(res.kind() == arrow::Datum::ARRAY,
                 "Binary op result must be an arrow array");
     return createArrowColumnVector(result_type, res.make_array());
   }
@@ -248,15 +248,15 @@ struct Compare {
     arrow::compute::ExecContext context(
         ctx.memory_resource->preConcatenate(thread_id));
     const auto &common_type = arrow::CTypeTraits<CommonCType>::type_singleton();
-    const auto &left_casted = CURA_GET_ARROW_RESULT(
+    const auto &left_casted = ARA_GET_ARROW_RESULT(
         arrow::compute::Cast(left->arrow(), common_type,
                              arrow::compute::CastOptions::Safe(), &context));
-    const auto &right_casted = CURA_GET_ARROW_RESULT(
+    const auto &right_casted = ARA_GET_ARROW_RESULT(
         arrow::compute::Cast(right->arrow(), common_type));
-    const auto &res = CURA_GET_ARROW_RESULT(arrow::compute::Compare(
+    const auto &res = ARA_GET_ARROW_RESULT(arrow::compute::Compare(
         left_casted, right_casted, arrow::compute::CompareOptions(compareOp),
         &context));
-    CURA_ASSERT(res.kind() == arrow::Datum::ARRAY,
+    ARA_ASSERT(res.kind() == arrow::Datum::ARRAY,
                 "Binary op result must be an arrow array");
     return createArrowColumnVector(result_type, res.make_array());
   }
@@ -280,9 +280,9 @@ std::shared_ptr<const Column> logicalAnd(const Context &ctx, ThreadId thread_id,
                                          const DataType &result_type) {
   arrow::compute::ExecContext context(
       ctx.memory_resource->preConcatenate(thread_id));
-  const auto &res = CURA_GET_ARROW_RESULT(
+  const auto &res = ARA_GET_ARROW_RESULT(
       arrow::compute::KleeneAnd(left->arrow(), right->arrow(), &context));
-  CURA_ASSERT(res.kind() == arrow::Datum::ARRAY,
+  ARA_ASSERT(res.kind() == arrow::Datum::ARRAY,
               "Binary op result must be an arrow array");
   return createArrowColumnVector(result_type, res.make_array());
 }
@@ -293,9 +293,9 @@ std::shared_ptr<const Column> logicalOr(const Context &ctx, ThreadId thread_id,
                                         const DataType &result_type) {
   arrow::compute::ExecContext context(
       ctx.memory_resource->preConcatenate(thread_id));
-  const auto &res = CURA_GET_ARROW_RESULT(
+  const auto &res = ARA_GET_ARROW_RESULT(
       arrow::compute::KleeneOr(left->arrow(), right->arrow(), &context));
-  CURA_ASSERT(res.kind() == arrow::Datum::ARRAY,
+  ARA_ASSERT(res.kind() == arrow::Datum::ARRAY,
               "Binary op result must be an arrow array");
   return createArrowColumnVector(result_type, res.make_array());
 }
@@ -347,7 +347,7 @@ dispatchBinaryOperator(const Context &ctx, ThreadId thread_id,
     return logicalOr(ctx, thread_id, std::forward<LeftColumn>(left),
                      std::forward<RightColumn>(right), result_type);
   default:
-    CURA_FAIL("Unimplemented");
+    ARA_FAIL("Unimplemented");
   }
 }
 
@@ -370,10 +370,10 @@ std::shared_ptr<const Column> dispatchBinaryOpColumns(
     return dispatchBinaryOperator(ctx, thread_id, left_cs, right_cv,
                                   binary_operator, result_type);
   } else if (left_cs && right_cs) {
-    CURA_FAIL("Unimplemented");
+    ARA_FAIL("Unimplemented");
   }
 
-  CURA_FAIL("Shouldn't reach here");
+  ARA_FAIL("Shouldn't reach here");
 }
 
 std::shared_ptr<const Column>
@@ -392,11 +392,11 @@ BinaryOp::evaluate(const Context &ctx, ThreadId thread_id,
                    const Fragment &fragment) const {
   auto left = operands_[0]->evaluate(ctx, thread_id, fragment);
   auto right = operands_[1]->evaluate(ctx, thread_id, fragment);
-  CURA_ASSERT(left, "Left column of binary op is null");
-  CURA_ASSERT(right, "Right column of binary op is null");
+  ARA_ASSERT(left, "Left column of binary op is null");
+  ARA_ASSERT(right, "Right column of binary op is null");
 
   return detail::evaluateBinaryOp(ctx, thread_id, left, right, binary_operator,
                                   data_type);
 }
 
-} // namespace cura::expression
+} // namespace ara::expression

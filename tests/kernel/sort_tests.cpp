@@ -5,18 +5,18 @@
 
 #include <gtest/gtest.h>
 
-using cura::VoidKernelId;
-using cura::VoidThreadId;
-using cura::kernel::HeapSource;
-using cura::kernel::PhysicalSortInfo;
-using cura::kernel::Sort;
-using cura::relational::SortInfo;
-using cura::test::data::assertColumnsEqual;
-using cura::test::data::makeDirectColumnVector;
-using cura::test::data::makeDirectColumnVectorN;
-using cura::test::data::makeFragment;
-using cura::type::DataType;
-using cura::type::Schema;
+using ara::VoidKernelId;
+using ara::VoidThreadId;
+using ara::kernel::HeapSource;
+using ara::kernel::PhysicalSortInfo;
+using ara::kernel::Sort;
+using ara::relational::SortInfo;
+using ara::test::data::assertColumnsEqual;
+using ara::test::data::makeDirectColumnVector;
+using ara::test::data::makeDirectColumnVectorN;
+using ara::test::data::makeFragment;
+using ara::type::DataType;
+using ara::type::Schema;
 
 TEST(SortTest, SimpleSort) {
   Option option;
@@ -58,7 +58,7 @@ TEST(SortTest, SimpleSort) {
   auto expected2 = makeDirectColumnVector<std::string>(
       DataType::stringType(true), {"i", "", "b", "a", "z", ""},
       {true, false, true, true, true, false});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected2, res->column(2));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected2, res->column(2));
 }

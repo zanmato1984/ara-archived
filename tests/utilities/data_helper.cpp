@@ -1,6 +1,6 @@
 #include "data_helper.h"
 
-namespace cura::test::data {
+namespace ara::test::data {
 
 namespace detail {
 
@@ -16,9 +16,9 @@ void assertArrowArraysEqual(const arrow::Array &expected,
       arrow::PrettyPrintOptions options(/*indent=*/2);
       options.window = 50;
       diff << "Expected:\n";
-      CURA_ASSERT_ARROW_OK(PrettyPrint(expected, options, &diff), "");
+      ARA_ASSERT_ARROW_OK(PrettyPrint(expected, options, &diff), "");
       diff << "\nActual:\n";
-      CURA_ASSERT_ARROW_OK(PrettyPrint(actual, options, &diff), "");
+      ARA_ASSERT_ARROW_OK(PrettyPrint(actual, options, &diff), "");
     }
     FAIL() << diff.str();
   }
@@ -33,14 +33,14 @@ void assertColumnsEqual(const ColumnVector &lhs, const ColumnVector &rhs,
 
   if (sort) {
     auto left_indices =
-        CURA_GET_ARROW_RESULT(arrow::compute::SortToIndices(*left));
-    left = CURA_GET_ARROW_RESULT(arrow::compute::Take(*left, *left_indices));
+        ARA_GET_ARROW_RESULT(arrow::compute::SortToIndices(*left));
+    left = ARA_GET_ARROW_RESULT(arrow::compute::Take(*left, *left_indices));
     auto right_indices =
-        CURA_GET_ARROW_RESULT(arrow::compute::SortToIndices(*right));
-    right = CURA_GET_ARROW_RESULT(arrow::compute::Take(*right, *right_indices));
+        ARA_GET_ARROW_RESULT(arrow::compute::SortToIndices(*right));
+    right = ARA_GET_ARROW_RESULT(arrow::compute::Take(*right, *right_indices));
   }
 
   detail::assertArrowArraysEqual(*left, *right, true);
 }
 
-} // namespace cura::test::data
+} // namespace ara::test::data

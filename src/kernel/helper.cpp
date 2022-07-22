@@ -2,13 +2,13 @@
 #include "ara/data/column_scalar.h"
 #include "ara/data/column_vector.h"
 
-namespace cura::kernel::detail {
+namespace ara::kernel::detail {
 
-using cura::data::Column;
-using cura::data::ColumnScalar;
-using cura::data::ColumnVector;
-using cura::data::createArrowColumnScalar;
-using cura::data::createArrowColumnVector;
+using ara::data::Column;
+using ara::data::ColumnScalar;
+using ara::data::ColumnVector;
+using ara::data::createArrowColumnScalar;
+using ara::data::createArrowColumnVector;
 
 std::shared_ptr<Fragment>
 concatFragments(MemoryResource::Underlying *underlying, const Schema &schema,
@@ -24,7 +24,7 @@ concatFragments(MemoryResource::Underlying *underlying, const Schema &schema,
         arrays.emplace_back(col->arrow());
       }
       const auto &concat =
-          CURA_GET_ARROW_RESULT(arrow::Concatenate(arrays, underlying));
+          ARA_GET_ARROW_RESULT(arrow::Concatenate(arrays, underlying));
       auto concated = createArrowColumnVector(data_type, concat);
       columns.emplace_back(std::move(concated));
     } else if (auto cs = std::dynamic_pointer_cast<const ColumnScalar>(column);
@@ -34,17 +34,17 @@ concatFragments(MemoryResource::Underlying *underlying, const Schema &schema,
           fragments.front()->column<ColumnScalar>(i_col)->dataType();
       for (const auto &fragment : fragments) {
         auto next_cs = fragment->column<ColumnScalar>(i_col);
-        CURA_ASSERT(next_cs && next_cs->arrow()->Equals(cs->arrow()),
+        ARA_ASSERT(next_cs && next_cs->arrow()->Equals(cs->arrow()),
                     "Mismatched column scalar between fragments");
         size += next_cs->size();
       }
       auto concated = createArrowColumnScalar(data_type, size, cs->arrow());
       columns.emplace_back(std::move(concated));
     } else {
-      CURA_FAIL("Neither column vector nor column scalar");
+      ARA_FAIL("Neither column vector nor column scalar");
     }
   }
   return std::make_shared<Fragment>(std::move(columns));
 }
 
-} // namespace cura::kernel::detail
+} // namespace ara::kernel::detail

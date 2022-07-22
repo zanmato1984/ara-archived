@@ -3,9 +3,9 @@
 #include "ara/data/column_scalar.h"
 #include "ara/data/fragment.h"
 
-namespace cura::expression {
+namespace ara::expression {
 
-using cura::data::createArrowColumnScalar;
+using ara::data::createArrowColumnScalar;
 
 std::shared_ptr<const Column>
 Literal::evaluate(const Context &ctx, ThreadId thread_id,
@@ -17,4 +17,4 @@ std::string Literal::toString() const {
   return scalar->ToString();
 }
 
-} // namespace cura::expression
+} // namespace ara::expression

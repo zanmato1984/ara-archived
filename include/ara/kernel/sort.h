@@ -7,13 +7,13 @@
 
 #include <mutex>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::expression::ColumnIdx;
-using cura::type::Schema;
+using ara::expression::ColumnIdx;
+using ara::type::Schema;
 
-using Order = cura::relational::SortInfo::Order;
-using NullOrder = cura::relational::SortInfo::NullOrder;
+using Order = ara::relational::SortInfo::Order;
+using NullOrder = ara::relational::SortInfo::NullOrder;
 
 struct PhysicalSortInfo {
   ColumnIdx idx;
@@ -67,4 +67,4 @@ private:
   mutable std::shared_ptr<const Fragment> converged_fragment;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

@@ -7,24 +7,24 @@
 
 #include <list>
 
-namespace cura::data {
+namespace ara::data {
 struct Fragment;
-} // namespace cura::data
+} // namespace ara::data
 
-namespace cura::relational {
+namespace ara::relational {
 struct Rel;
-} // namespace cura::relational
+} // namespace ara::relational
 
-namespace cura::driver {
+namespace ara::driver {
 
-using cura::data::Fragment;
-using cura::execution::Context;
-using cura::execution::Executor;
-using cura::relational::Rel;
+using ara::data::Fragment;
+using ara::execution::Context;
+using ara::execution::Executor;
+using ara::relational::Rel;
 
-/// Entry of CURA CPP API.
-/// Users can compose their own CURA plans using classes under namespace
-/// `cura::relational`, or assemble plans into JSON format string like CURA C
+/// Entry of ARA CPP API.
+/// Users can compose their own ARA plans using classes under namespace
+/// `ara::relational`, or assemble plans into JSON format string like ARA C
 /// API does, and pass them into the corresponding `compile` methods. Data
 /// passed around is represented using arrow class `arrow::Array` and the life
 /// cycle is fully managed using CPP shared pointer.
@@ -68,4 +68,4 @@ private:
   std::unique_ptr<Executor> executor;
 };
 
-} // namespace cura::driver
+} // namespace ara::driver

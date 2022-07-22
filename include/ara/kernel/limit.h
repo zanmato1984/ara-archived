@@ -7,7 +7,7 @@
 
 #include <mutex>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
 struct Limit : public NonSourceStreamKernel {
   explicit Limit(KernelId id, size_t offset_, size_t n_)
@@ -35,4 +35,4 @@ private:
   mutable size_t remaining;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

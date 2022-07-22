@@ -10,65 +10,65 @@
 #include <rapidjson/error/en.h>
 #include <stack>
 
-namespace cura::relational {
+namespace ara::relational {
 
-using cura::expression::Aggregation;
-using cura::expression::AggregationOperator;
-using cura::expression::aggregationOperatorFromString;
-using cura::expression::BinaryOp;
-using cura::expression::binaryOperatorFromString;
-using cura::expression::ColumnIdx;
-using cura::expression::Literal;
-using cura::expression::NthElement;
-using cura::expression::TiUnaryOp;
-using cura::expression::UnaryOp;
-using cura::relational::BuildSide;
-using cura::type::TypeId;
-using cura::type::typeIdFromString;
+using ara::expression::Aggregation;
+using ara::expression::AggregationOperator;
+using ara::expression::aggregationOperatorFromString;
+using ara::expression::BinaryOp;
+using ara::expression::binaryOperatorFromString;
+using ara::expression::ColumnIdx;
+using ara::expression::Literal;
+using ara::expression::NthElement;
+using ara::expression::TiUnaryOp;
+using ara::expression::UnaryOp;
+using ara::relational::BuildSide;
+using ara::type::TypeId;
+using ara::type::typeIdFromString;
 
 namespace detail {
 
 inline const rapidjson::Value &jsonField(const rapidjson::Value &obj,
                                          const std::string &field) {
-  CURA_ASSERT_JSON(obj.IsObject());
+  ARA_ASSERT_JSON(obj.IsObject());
   const auto field_it = obj.FindMember(field.data());
-  CURA_ASSERT(field_it != obj.MemberEnd(), "Couldn't find field " + field);
+  ARA_ASSERT(field_it != obj.MemberEnd(), "Couldn't find field " + field);
   return field_it->value;
 }
 
 inline bool jsonBool(const rapidjson::Value &obj) {
-  CURA_ASSERT_JSON(obj.IsBool());
+  ARA_ASSERT_JSON(obj.IsBool());
   return obj.GetBool();
 }
 
 inline int64_t jsonInt64(const rapidjson::Value &obj) {
-  CURA_ASSERT_JSON(obj.IsInt64());
+  ARA_ASSERT_JSON(obj.IsInt64());
   return obj.GetInt64();
 }
 
 inline uint64_t jsonUint64(const rapidjson::Value &obj) {
-  CURA_ASSERT_JSON(obj.IsUint64());
+  ARA_ASSERT_JSON(obj.IsUint64());
   return obj.GetUint64();
 }
 
 inline double jsonFloat(const rapidjson::Value &obj) {
-  CURA_ASSERT_JSON(obj.IsFloat() || obj.IsInt() || obj.IsUint());
+  ARA_ASSERT_JSON(obj.IsFloat() || obj.IsInt() || obj.IsUint());
   return obj.GetFloat();
 }
 
 inline double jsonDouble(const rapidjson::Value &obj) {
-  CURA_ASSERT_JSON(obj.IsDouble() || obj.IsFloat() || obj.IsInt() ||
+  ARA_ASSERT_JSON(obj.IsDouble() || obj.IsFloat() || obj.IsInt() ||
                    obj.IsInt64() || obj.IsUint() || obj.IsUint64());
   return obj.GetDouble();
 }
 
 inline std::string jsonString(const rapidjson::Value &obj) {
-  CURA_ASSERT_JSON(obj.IsString());
+  ARA_ASSERT_JSON(obj.IsString());
   return obj.GetString();
 }
 
 DataType parseDataType(const rapidjson::Value &json) {
-  CURA_ASSERT_JSON(json.IsObject());
+  ARA_ASSERT_JSON(json.IsObject());
   const auto &type_json = jsonField(json, "type");
   auto type_id = typeIdFromString(jsonString(type_json));
   const auto &nullable_json = jsonField(json, "nullable");
@@ -145,7 +145,7 @@ std::shared_ptr<const Expression> parseLiteral(const rapidjson::Value &json) {
     return std::make_shared<Literal>(type_id, literal);
   }
   default:
-    CURA_FAIL("Invalid literal type " +
+    ARA_FAIL("Invalid literal type " +
               std::to_string(static_cast<int32_t>(type_id)));
   }
 }
@@ -154,7 +154,7 @@ std::shared_ptr<const Expression> parseColumnRef(const rapidjson::Value &json,
                                                  const Schema &schema) {
   const auto &col_ref_json = jsonField(json, "col_ref");
   auto col_id = static_cast<ColumnIdx>(jsonInt64(col_ref_json));
-  CURA_ASSERT(col_id < schema.size(), "Invalid column index");
+  ARA_ASSERT(col_id < schema.size(), "Invalid column index");
   const auto &data_type = schema[col_id];
   return std::make_shared<ColumnRef>(col_id, data_type);
 }
@@ -168,7 +168,7 @@ std::shared_ptr<const Expression> parseUnaryOp(const rapidjson::Value &json,
                                                const Schema &schema) {
   const auto &operands_json = jsonField(json, "operands");
   auto operands = parseExpressions(operands_json, schema);
-  CURA_ASSERT(operands.size() == 1, "Unary op operand size must be 1");
+  ARA_ASSERT(operands.size() == 1, "Unary op operand size must be 1");
   const auto &dt_json = jsonField(json, "type");
   auto data_type = parseDataType(dt_json);
   const auto &op_json = jsonField(json, unary_op_key);
@@ -182,7 +182,7 @@ std::shared_ptr<const Expression> parseBinaryOp(const rapidjson::Value &json,
   auto binary_op = binaryOperatorFromString(jsonString(op_json));
   const auto &operands_json = jsonField(json, "operands");
   auto operands = parseExpressions(operands_json, schema);
-  CURA_ASSERT(operands.size() == 2, "Binary op operand size must be 2");
+  ARA_ASSERT(operands.size() == 2, "Binary op operand size must be 2");
   const auto &dt_json = jsonField(json, "type");
   auto data_type = parseDataType(dt_json);
   return std::make_shared<BinaryOp>(binary_op, operands[0], operands[1],
@@ -195,7 +195,7 @@ std::shared_ptr<const Expression> parseAggregation(const rapidjson::Value &json,
   auto op = aggregationOperatorFromString(jsonString(op_json));
   const auto &operands_json = jsonField(json, "operands");
   auto operands = parseExpressions(operands_json, schema);
-  CURA_ASSERT(operands.size() == 1, "Aggregation operand size must be 1");
+  ARA_ASSERT(operands.size() == 1, "Aggregation operand size must be 1");
   const auto &dt_json = jsonField(json, "type");
   auto data_type = parseDataType(dt_json);
   // Aggregation-specific parsing.
@@ -210,7 +210,7 @@ std::shared_ptr<const Expression> parseAggregation(const rapidjson::Value &json,
 
 std::shared_ptr<const Expression> parseExpression(const rapidjson::Value &json,
                                                   const Schema &schema) {
-  CURA_ASSERT_JSON(json.IsObject());
+  ARA_ASSERT_JSON(json.IsObject());
   if (json.HasMember("literal")) {
     return parseLiteral(json);
   }
@@ -229,12 +229,12 @@ std::shared_ptr<const Expression> parseExpression(const rapidjson::Value &json,
   if (json.HasMember("agg")) {
     return parseAggregation(json, schema);
   }
-  CURA_FAIL("Unknown expression");
+  ARA_FAIL("Unknown expression");
 }
 
 std::vector<std::shared_ptr<const Expression>>
 parseExpressions(const rapidjson::Value &json, const Schema &schema) {
-  CURA_ASSERT_JSON(json.IsArray());
+  ARA_ASSERT_JSON(json.IsArray());
   std::vector<std::shared_ptr<const Expression>> expressions;
   for (auto it = json.Begin(); it != json.End(); it++) {
     const auto &expression_json = *it;
@@ -244,7 +244,7 @@ parseExpressions(const rapidjson::Value &json, const Schema &schema) {
 }
 
 Schema parseSchema(const rapidjson::Value &json) {
-  CURA_ASSERT_JSON(json.IsArray());
+  ARA_ASSERT_JSON(json.IsArray());
   Schema schema;
   for (auto it = json.Begin(); it != json.End(); it++) {
     const auto &dt_json = *it;
@@ -266,7 +266,7 @@ void parseInputSource(const rapidjson::Value &rel,
 
 void parseFilter(const rapidjson::Value &rel,
                  std::stack<std::shared_ptr<const Rel>> &rel_stack) {
-  CURA_ASSERT(!rel_stack.empty(), "No child of RelFilter");
+  ARA_ASSERT(!rel_stack.empty(), "No child of RelFilter");
   auto child = rel_stack.top();
   rel_stack.pop();
   const auto &cond_json = jsonField(rel, "condition");
@@ -278,7 +278,7 @@ void parseFilter(const rapidjson::Value &rel,
 template <typename UnionType>
 void parseUnion(const rapidjson::Value &rel,
                 std::stack<std::shared_ptr<const Rel>> &rel_stack) {
-  CURA_ASSERT(rel_stack.size() >= 2, "No child of RelFilter");
+  ARA_ASSERT(rel_stack.size() >= 2, "No child of RelFilter");
   auto child_1 = rel_stack.top();
   rel_stack.pop();
   auto child_0 = rel_stack.top();
@@ -293,7 +293,7 @@ void parseHashJoin(const rapidjson::Value &rel,
   const auto &type_json = jsonField(rel, "type");
   auto type_string = jsonString(type_json);
   auto join_type = joinTypeFromString(type_string);
-  CURA_ASSERT(rel_stack.size() >= 2, "No child of RelFilter");
+  ARA_ASSERT(rel_stack.size() >= 2, "No child of RelFilter");
   auto right = rel_stack.top();
   rel_stack.pop();
   auto left = rel_stack.top();
@@ -302,7 +302,7 @@ void parseHashJoin(const rapidjson::Value &rel,
   schema.insert(schema.end(), right->output().begin(), right->output().end());
   auto build_side = BuildSide::RIGHT;
   if (rel.HasMember("build_side")) {
-    CURA_ASSERT(join_type == JoinType::INNER,
+    ARA_ASSERT(join_type == JoinType::INNER,
                 "Specifying build side can only be used for inner join");
     const auto &build_side_json = jsonField(rel, "build_side");
     auto build_side_str = jsonString(build_side_json);
@@ -317,7 +317,7 @@ void parseHashJoin(const rapidjson::Value &rel,
 
 void parseProject(const rapidjson::Value &rel,
                   std::stack<std::shared_ptr<const Rel>> &rel_stack) {
-  CURA_ASSERT(!rel_stack.empty(), "No child of RelProject");
+  ARA_ASSERT(!rel_stack.empty(), "No child of RelProject");
   auto child = rel_stack.top();
   rel_stack.pop();
   const auto &exprs_json = jsonField(rel, "exprs");
@@ -328,7 +328,7 @@ void parseProject(const rapidjson::Value &rel,
 
 void parseAggregate(const rapidjson::Value &rel,
                     std::stack<std::shared_ptr<const Rel>> &rel_stack) {
-  CURA_ASSERT(!rel_stack.empty(), "No child of RelAggregate");
+  ARA_ASSERT(!rel_stack.empty(), "No child of RelAggregate");
   auto child = rel_stack.top();
   rel_stack.pop();
   const auto &groups_json = jsonField(rel, "groups");
@@ -342,11 +342,11 @@ void parseAggregate(const rapidjson::Value &rel,
 
 void parseSort(const rapidjson::Value &rel,
                std::stack<std::shared_ptr<const Rel>> &rel_stack) {
-  CURA_ASSERT(!rel_stack.empty(), "No child of RelSort");
+  ARA_ASSERT(!rel_stack.empty(), "No child of RelSort");
   auto child = rel_stack.top();
   rel_stack.pop();
   const auto &sort_infos_json = jsonField(rel, "sort_infos");
-  CURA_ASSERT_JSON(sort_infos_json.IsArray());
+  ARA_ASSERT_JSON(sort_infos_json.IsArray());
   std::vector<SortInfo> sort_infos;
   for (auto it = sort_infos_json.Begin(); it != sort_infos_json.End(); it++) {
     const auto &sort_info_json = *it;
@@ -359,7 +359,7 @@ void parseSort(const rapidjson::Value &rel,
       } else if (order_str == "DESC") {
         order = SortInfo::Order::DESCENDING;
       } else {
-        CURA_FAIL("Unknown order " + order_str);
+        ARA_FAIL("Unknown order " + order_str);
       }
     }
     auto null_order = SortInfo::NullOrder::FIRST;
@@ -370,7 +370,7 @@ void parseSort(const rapidjson::Value &rel,
       } else if (null_order_str == "NULLS_LAST") {
         null_order = SortInfo::NullOrder::LAST;
       } else {
-        CURA_FAIL("Unknown null order " + null_order_str);
+        ARA_FAIL("Unknown null order " + null_order_str);
       }
     }
     sort_infos.emplace_back(SortInfo{expr, order, null_order});
@@ -381,16 +381,16 @@ void parseSort(const rapidjson::Value &rel,
 
 void parseLimit(const rapidjson::Value &rel,
                 std::stack<std::shared_ptr<const Rel>> &rel_stack) {
-  CURA_ASSERT(!rel_stack.empty(), "No child of RelLimit");
+  ARA_ASSERT(!rel_stack.empty(), "No child of RelLimit");
   auto child = rel_stack.top();
   rel_stack.pop();
   const auto &n_json = jsonField(rel, "n");
-  CURA_ASSERT_JSON(n_json.IsUint64() || n_json.IsUint());
+  ARA_ASSERT_JSON(n_json.IsUint64() || n_json.IsUint());
   size_t n = jsonUint64(n_json);
   size_t offset = 0;
   if (rel.HasMember("offset")) {
     const auto &offset_json = jsonField(rel, "offset");
-    CURA_ASSERT_JSON(offset_json.IsUint64() || offset_json.IsUint());
+    ARA_ASSERT_JSON(offset_json.IsUint64() || offset_json.IsUint());
     offset = jsonUint64(offset_json);
   }
   auto limit = std::make_shared<RelLimit>(child, offset, n);
@@ -419,7 +419,7 @@ void dispatchRel(const rapidjson::Value &rel,
   } else if (rel_op == "Limit") {
     return parseLimit(rel, rel_stack);
   } else {
-    CURA_FAIL("Unknown Rel type " + rel_op);
+    ARA_FAIL("Unknown Rel type " + rel_op);
   }
 }
 
@@ -430,20 +430,20 @@ std::shared_ptr<const Rel> parseJson(const std::string &json) {
   doc.Parse(json.data());
   if (doc.HasParseError()) {
     doc.GetParseError();
-    CURA_FAIL("Failed to parse plan from json (offset " +
+    ARA_FAIL("Failed to parse plan from json (offset " +
               std::to_string(doc.GetErrorOffset()) +
               "): " + rapidjson::GetParseError_En(doc.GetParseError()));
   }
-  CURA_ASSERT_JSON(doc.IsObject());
+  ARA_ASSERT_JSON(doc.IsObject());
   const auto &rels = detail::jsonField(doc, "rels");
-  CURA_ASSERT_JSON(rels.IsArray());
+  ARA_ASSERT_JSON(rels.IsArray());
   std::stack<std::shared_ptr<const Rel>> rel_stack;
   for (auto it = rels.Begin(); it != rels.End(); it++) {
     const auto &rel = *it;
     detail::dispatchRel(rel, rel_stack);
   }
-  CURA_ASSERT(rel_stack.size() == 1, "Invalid json plan");
+  ARA_ASSERT(rel_stack.size() == 1, "Invalid json plan");
   return rel_stack.top();
 }
 
-} // namespace cura::relational
+} // namespace ara::relational

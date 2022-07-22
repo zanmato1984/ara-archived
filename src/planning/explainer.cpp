@@ -1,6 +1,6 @@
 #include "explainer.h"
 
-namespace cura::planning {
+namespace ara::planning {
 
 std::vector<std::string>
 Explainer::defaultVisit(const std::shared_ptr<const Rel> &rel,
@@ -21,4 +21,4 @@ Explainer::defaultVisit(const std::shared_ptr<const Rel> &rel,
   return combined;
 }
 
-} // namespace cura::planning
+} // namespace ara::planning

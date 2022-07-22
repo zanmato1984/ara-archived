@@ -8,13 +8,13 @@ namespace arrow {
 class MemoryPool;
 }
 
-namespace cura::driver {
+namespace ara::driver {
 struct Option;
-} // namespace cura::driver
+} // namespace ara::driver
 
-namespace cura::execution {
+namespace ara::execution {
 
-using cura::driver::Option;
+using ara::driver::Option;
 
 struct MemoryResource {
   enum class Mode : int8_t {
@@ -47,4 +47,4 @@ protected:
 
 std::unique_ptr<MemoryResource> createMemoryResource(const Option &option);
 
-} // namespace cura::execution
+} // namespace ara::execution

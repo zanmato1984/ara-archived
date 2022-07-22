@@ -2,13 +2,13 @@
 
 #include "utilities/data_helper.h"
 
-using cura::data::ColumnVector;
-using cura::test::data::makeArrowColumnVector;
-using cura::test::data::makeArrowColumnVectorN;
-using cura::test::data::makeFragment;
-using cura::test::database::Table;
-using cura::test::database::TableId;
-using cura::type::DataType;
+using ara::data::ColumnVector;
+using ara::test::data::makeArrowColumnVector;
+using ara::test::data::makeArrowColumnVectorN;
+using ara::test::data::makeFragment;
+using ara::test::database::Table;
+using ara::test::database::TableId;
+using ara::type::DataType;
 
 template <typename T>
 Table makeTable(const DataType &data_type, TableId id, size_t num_fragments,

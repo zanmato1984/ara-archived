@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace cura::relational {
+namespace ara::relational {
 
 template <typename Impl, typename Result> struct RelVisitor {
   Result visit(const std::shared_ptr<const Rel> &rel) {
@@ -84,8 +84,8 @@ private:
 
 #undef REL_CASE
 
-    CURA_FAIL("Unknown Rel type.");
+    ARA_FAIL("Unknown Rel type.");
   }
 };
 
-} // namespace cura::relational
+} // namespace ara::relational

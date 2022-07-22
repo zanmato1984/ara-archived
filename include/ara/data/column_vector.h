@@ -6,7 +6,7 @@
 
 #include <arrow/api.h>
 
-namespace cura::data {
+namespace ara::data {
 
 struct ColumnVector : public Column {
   using Column::Column;
@@ -23,8 +23,8 @@ struct ColumnVectorArrow : public ColumnVector {
   ColumnVectorArrow(DataType data_type_,
                     const std::shared_ptr<arrow::Array> array_)
       : ColumnVector(std::move(data_type_)), array(array_) {
-    CURA_ASSERT(array, "Underlying column couldn't be null");
-    CURA_ASSERT(
+    ARA_ASSERT(array, "Underlying column couldn't be null");
+    ARA_ASSERT(
         array->type()->Equals(data_type.arrow()),
         "Mismatched data type between column vector and underlying column");
   }
@@ -43,4 +43,4 @@ private:
   const std::shared_ptr<arrow::Array> array;
 };
 
-} // namespace cura::data
+} // namespace ara::data

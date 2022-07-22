@@ -2,21 +2,21 @@
 
 #include "ara/relational/rel_visitor.h"
 
-namespace cura::planning {
+namespace ara::planning {
 
-using cura::relational::Rel;
-using cura::relational::RelAggregate;
-using cura::relational::RelFilter;
-using cura::relational::RelHashJoin;
-using cura::relational::RelHashJoinBuild;
-using cura::relational::RelHashJoinProbe;
-using cura::relational::RelInputSource;
-using cura::relational::RelLimit;
-using cura::relational::RelProject;
-using cura::relational::RelSort;
-using cura::relational::RelUnion;
-using cura::relational::RelUnionAll;
-using cura::relational::RelVisitor;
+using ara::relational::Rel;
+using ara::relational::RelAggregate;
+using ara::relational::RelFilter;
+using ara::relational::RelHashJoin;
+using ara::relational::RelHashJoinBuild;
+using ara::relational::RelHashJoinProbe;
+using ara::relational::RelInputSource;
+using ara::relational::RelLimit;
+using ara::relational::RelProject;
+using ara::relational::RelSort;
+using ara::relational::RelUnion;
+using ara::relational::RelUnionAll;
+using ara::relational::RelVisitor;
 
 template <typename Impl>
 struct RelDeepCopyVisitor
@@ -90,7 +90,7 @@ struct RelDeepCopyVisitor
   std::shared_ptr<const Rel>
   defaultVisit(const std::shared_ptr<const Rel> &rel,
                const std::vector<std::shared_ptr<const Rel>> &children) {
-    CURA_FAIL("Shouldn't reach here");
+    ARA_FAIL("Shouldn't reach here");
   }
 
   std::shared_ptr<const Rel>
@@ -175,4 +175,4 @@ private:
   const Impl &impl() const { return *static_cast<const Impl *>(this); }
 };
 
-} // namespace cura::planning
+} // namespace ara::planning

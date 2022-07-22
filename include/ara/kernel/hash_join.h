@@ -7,12 +7,12 @@
 #include <mutex>
 #include <numeric>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::expression::ColumnIdx;
-using cura::relational::BuildSide;
-using cura::relational::JoinType;
-using cura::type::Schema;
+using ara::expression::ColumnIdx;
+using ara::relational::BuildSide;
+using ara::relational::JoinType;
+using ara::type::Schema;
 
 /// HashJoinBuild/Probe always come in pair, so they don't follow the rule of
 /// passes data through heap. They share the data via an implicit way that both
@@ -94,4 +94,4 @@ private:
   std::shared_ptr<const detail::HashJoinImpl> impl;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

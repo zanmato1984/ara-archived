@@ -1,8 +1,8 @@
 #include "ara/execution/context.h"
 
-namespace cura::execution {
+namespace ara::execution {
 
 Context::Context(const Option &option_)
     : option(option_), memory_resource(createMemoryResource(option)) {}
 
-} // namespace cura::execution
+} // namespace ara::execution

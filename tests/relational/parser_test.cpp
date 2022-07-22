@@ -7,11 +7,11 @@
 #include <gtest/gtest.h>
 #include <rapidjson/document.h>
 
-using cura::driver::Option;
-using cura::planning::Planner;
-using cura::relational::parseJson;
-using cura::relational::RelProject;
-using cura::test::relational::toJson;
+using ara::driver::Option;
+using ara::planning::Planner;
+using ara::relational::parseJson;
+using ara::relational::RelProject;
+using ara::test::relational::toJson;
 
 void explainRel(std::shared_ptr<const Rel> rel, bool extended) {
   Option option;

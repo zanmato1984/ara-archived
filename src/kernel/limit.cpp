@@ -2,9 +2,9 @@
 #include "ara/data/column_vector.h"
 #include "ara/data/fragment.h"
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::data::Column;
+using ara::data::Column;
 
 std::shared_ptr<const Fragment>
 Limit::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
@@ -44,4 +44,4 @@ Limit::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
   return std::make_shared<Fragment>(std::move(columns));
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel

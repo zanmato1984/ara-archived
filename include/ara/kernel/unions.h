@@ -5,9 +5,9 @@
 
 #include <mutex>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::type::Schema;
+using ara::type::Schema;
 
 struct Union : public HeapNonStreamKernel {
   explicit Union(KernelId id, Schema schema_)
@@ -47,4 +47,4 @@ protected:
              std::shared_ptr<const Fragment> fragment) const override;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

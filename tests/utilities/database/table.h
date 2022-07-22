@@ -2,9 +2,9 @@
 
 #include "ara/data/fragment.h"
 
-namespace cura::test::database {
+namespace ara::test::database {
 
-using cura::data::Fragment;
+using ara::data::Fragment;
 
 using TableId = int64_t;
 
@@ -13,4 +13,4 @@ struct Table {
   std::vector<std::shared_ptr<const Fragment>> fragments;
 };
 
-} // namespace cura::test::database
+} // namespace ara::test::database

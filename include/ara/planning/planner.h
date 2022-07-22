@@ -5,23 +5,23 @@
 #include <string>
 #include <vector>
 
-namespace cura::driver {
+namespace ara::driver {
 struct Option;
-} // namespace cura::driver
+} // namespace ara::driver
 
-namespace cura::execution {
+namespace ara::execution {
 struct Pipeline;
-} // namespace cura::execution
+} // namespace ara::execution
 
-namespace cura::relational {
+namespace ara::relational {
 struct Rel;
-} // namespace cura::relational
+} // namespace ara::relational
 
-namespace cura::planning {
+namespace ara::planning {
 
-using cura::driver::Option;
-using cura::execution::Pipeline;
-using cura::relational::Rel;
+using ara::driver::Option;
+using ara::execution::Pipeline;
+using ara::relational::Rel;
 
 struct Planner {
   explicit Planner(const Option &option_) : option(option_) {}
@@ -36,4 +36,4 @@ private:
   const Option &option;
 };
 
-} // namespace cura::planning
+} // namespace ara::planning

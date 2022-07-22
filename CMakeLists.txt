@@ -67,4 +67,4 @@ if(ENABLE_TESTS)
 #  endif(GTEST_FOUND)
 endif(ENABLE_TESTS)
 
-message(STATUS "ARA_TEST_LIST set to: ${CURA_TEST_LIST}")
+message(STATUS "ARA_TEST_LIST set to: ${ARA_TEST_LIST}")

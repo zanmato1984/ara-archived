@@ -4,12 +4,12 @@
 #include "ara/execution/context.h"
 #include "ara/type/data_type.h"
 
-namespace cura::expression::detail {
+namespace ara::expression::detail {
 
-using cura::data::Column;
-using cura::data::ColumnVector;
-using cura::execution::Context;
-using cura::type::DataType;
+using ara::data::Column;
+using ara::data::ColumnVector;
+using ara::execution::Context;
+using ara::type::DataType;
 
 constexpr uint64_t YEAR_BIT_FIELD_OFFSET = 50;
 constexpr uint64_t YEAR_BIT_FIELD_WIDTH = 14;
@@ -21,4 +21,4 @@ extractYear(const Context &ctx, ThreadId thread_id,
             std::shared_ptr<const ColumnVector> cv,
             const DataType &result_type);
 
-} // namespace cura::expression::detail
+} // namespace ara::expression::detail

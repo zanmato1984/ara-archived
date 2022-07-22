@@ -8,14 +8,14 @@
 #include <string>
 #include <vector>
 
-namespace cura::data {
+namespace ara::data {
 struct Fragment;
-} // namespace cura::data
+} // namespace ara::data
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::data::Fragment;
-using cura::execution::Context;
+using ara::data::Fragment;
+using ara::execution::Context;
 
 struct Kernel {
   explicit Kernel(KernelId id_) : id(id_) {}
@@ -53,7 +53,7 @@ struct NonStreamKernel : public NonTerminalKernel {
   stream(const Context &ctx, ThreadId thread_id, KernelId upstream,
          std::shared_ptr<const Fragment> fragment,
          size_t rows) const override final {
-    CURA_FAIL("stream is not allowed for a " + name() + " kernel");
+    ARA_FAIL("stream is not allowed for a " + name() + " kernel");
   }
 
   virtual void concatenate(const Context &ctx) const = 0;
@@ -113,7 +113,7 @@ struct Terminal : public Kernel {
   explicit Terminal(KernelId id,
                     std::vector<std::shared_ptr<const NonStreamKernel>> kernels)
       : Kernel(id), non_stream_kernels(std::move(kernels)) {
-    CURA_ASSERT(!non_stream_kernels.empty(),
+    ARA_ASSERT(!non_stream_kernels.empty(),
                 "No kernels in " + name() + " kernel");
   }
 
@@ -122,4 +122,4 @@ struct Terminal : public Kernel {
   std::vector<std::shared_ptr<const NonStreamKernel>> non_stream_kernels;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

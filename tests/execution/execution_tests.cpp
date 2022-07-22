@@ -8,13 +8,13 @@
 
 #include <gtest/gtest.h>
 
-using cura::test::database::Database;
-using cura::test::database::EvenlyParallelCDriver;
-using cura::test::database::EvenlyParallelCppDriver;
-using cura::test::database::PrintArrowArrayPerLineSink;
-using cura::test::database::Table;
-using cura::test::execution::testExecute;
-using cura::test::relational::toJson;
+using ara::test::database::Database;
+using ara::test::database::EvenlyParallelCDriver;
+using ara::test::database::EvenlyParallelCppDriver;
+using ara::test::database::PrintArrowArrayPerLineSink;
+using ara::test::database::Table;
+using ara::test::execution::testExecute;
+using ara::test::relational::toJson;
 
 TEST(ExecutionTest, OneInputOnly) {
   Table t = makeTableN<int32_t>(DataType::int32Type(), 100, 4, 4);

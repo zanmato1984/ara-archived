@@ -5,7 +5,7 @@
 
 #include <optional>
 
-namespace cura::data {
+namespace ara::data {
 
 struct ColumnScalar : public Column {
   explicit ColumnScalar(DataType data_type, size_t size)
@@ -30,4 +30,4 @@ private:
   std::shared_ptr<arrow::Scalar> scalar;
 };
 
-} // namespace cura::data
+} // namespace ara::data

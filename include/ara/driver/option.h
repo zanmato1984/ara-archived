@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace cura::driver {
+namespace ara::driver {
 
 struct Option {
   Option();
@@ -18,4 +18,4 @@ struct Option {
   size_t bucket_aggregate_buckets;
 };
 
-} // namespace cura::driver
+} // namespace ara::driver

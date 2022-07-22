@@ -8,16 +8,16 @@
 #include <memory>
 #include <vector>
 
-namespace cura::data {
+namespace ara::data {
 struct Fragment;
-} // namespace cura::data
+} // namespace ara::data
 
-namespace cura::expression {
+namespace ara::expression {
 
-using cura::data::Column;
-using cura::data::Fragment;
-using cura::execution::Context;
-using cura::type::DataType;
+using ara::data::Column;
+using ara::data::Fragment;
+using ara::execution::Context;
+using ara::type::DataType;
 
 struct Expression {
   virtual ~Expression() = default;
@@ -77,7 +77,7 @@ protected:
 struct BaseUnaryOp : public Op {
   BaseUnaryOp(std::shared_ptr<const Expression> operand, DataType data_type)
       : Op({operand}, data_type) {
-    CURA_ASSERT(operand, "Invalid operand for BaseUnaryOp");
+    ARA_ASSERT(operand, "Invalid operand for BaseUnaryOp");
   }
 
   const DataType &dataType() const override { return data_type; }
@@ -89,4 +89,4 @@ struct BaseUnaryOp : public Op {
   virtual std::string operatorToString() const = 0;
 };
 
-} // namespace cura::expression
+} // namespace ara::expression

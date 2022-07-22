@@ -5,9 +5,9 @@
 
 #include <sstream>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::expression::aggregationOperatorToString;
+using ara::expression::aggregationOperatorToString;
 
 Aggregate::Aggregate(KernelId id, Schema input_schema_, Schema output_schema_,
                      std::vector<ColumnIdx> keys_,
@@ -15,7 +15,7 @@ Aggregate::Aggregate(KernelId id, Schema input_schema_, Schema output_schema_,
     : HeapNonStreamKernel(id), input_schema(std::move(input_schema_)),
       output_schema(std::move(output_schema_)), keys(std::move(keys_)),
       aggregations(std::move(aggregations_)) {
-  CURA_ASSERT(!aggregations.empty(), "Empty aggregations for Aggregate");
+  ARA_ASSERT(!aggregations.empty(), "Empty aggregations for Aggregate");
 }
 
 void Aggregate::push(const Context &ctx, ThreadId thread_id, KernelId upstream,
@@ -68,4 +68,4 @@ std::string Aggregate::toString() const {
   return Kernel::toString() + "(" + ss.str() + ")";
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel

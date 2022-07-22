@@ -10,13 +10,13 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-namespace cura::test::relational {
+namespace ara::test::relational {
 
 namespace detail {
 
-using namespace cura::relational;
-using namespace cura::expression;
-using namespace cura::type;
+using namespace ara::relational;
+using namespace ara::expression;
+using namespace ara::type;
 
 void flattenRel(std::shared_ptr<const Rel> rel,
                 std::vector<std::shared_ptr<const Rel>> &rels) {
@@ -96,7 +96,7 @@ void literalToJson(rapidjson::Writer<rapidjson::StringBuffer> &writer,
     writer.Int64(literal->value<int64_t>());
     break;
   default:
-    CURA_FAIL("Invalid literal value " + literal->toString());
+    ARA_FAIL("Invalid literal value " + literal->toString());
   }
 }
 
@@ -306,7 +306,7 @@ void dispatchRel(rapidjson::Writer<rapidjson::StringBuffer> &writer,
     writer.String("Limit");
     limitToJson(writer, limit);
   } else {
-    CURA_FAIL("Unknown Rel type " + rel->toString());
+    ARA_FAIL("Unknown Rel type " + rel->toString());
   }
   writer.EndObject();
 }
@@ -331,4 +331,4 @@ std::string toJson(std::shared_ptr<const Rel> rel) {
   return buf.GetString();
 }
 
-} // namespace cura::test::relational
+} // namespace ara::test::relational

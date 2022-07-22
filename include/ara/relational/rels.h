@@ -9,12 +9,12 @@
 #include <sstream>
 #include <string>
 
-namespace cura::relational {
+namespace ara::relational {
 
-using cura::expression::ColumnRef;
-using cura::expression::Expression;
-using cura::type::DataType;
-using cura::type::Schema;
+using ara::expression::ColumnRef;
+using ara::expression::Expression;
+using ara::type::DataType;
+using ara::type::Schema;
 
 struct Rel {
   std::vector<std::shared_ptr<const Rel>> inputs;
@@ -63,8 +63,8 @@ struct RelFilter : public Rel {
   RelFilter(std::shared_ptr<const Rel> input,
             std::shared_ptr<const Expression> cond_)
       : Rel({input}), cond(cond_) {
-    CURA_ASSERT(input, "Invalid RelFilter input");
-    CURA_ASSERT(cond, "Invalid RelFilter condition");
+    ARA_ASSERT(input, "Invalid RelFilter input");
+    ARA_ASSERT(cond, "Invalid RelFilter condition");
   }
 
   const Schema &output() const override { return inputs[0]->output(); }
@@ -84,13 +84,13 @@ private:
 struct RelUnion : public Rel {
   RelUnion(std::vector<std::shared_ptr<const Rel>> inputs_)
       : Rel(std::move(inputs_)) {
-    CURA_ASSERT(inputs.size() > 1, "Invalid RelUnion input size");
+    ARA_ASSERT(inputs.size() > 1, "Invalid RelUnion input size");
 
     const auto &schema = inputs[0]->output();
     std::for_each(inputs.begin() + 1, inputs.end(),
                   [&schema](const auto &input) {
-                    CURA_ASSERT(input, "Invalid RelUnion input");
-                    CURA_ASSERT(input->output() == schema,
+                    ARA_ASSERT(input, "Invalid RelUnion input");
+                    ARA_ASSERT(input->output() == schema,
                                 "Mismatched RelUnion input schema");
                   });
   }
@@ -103,13 +103,13 @@ struct RelUnion : public Rel {
 struct RelUnionAll : public Rel {
   RelUnionAll(std::vector<std::shared_ptr<const Rel>> inputs_)
       : Rel(std::move(inputs_)) {
-    CURA_ASSERT(inputs.size() > 1, "Invalid RelUnionAll input size");
+    ARA_ASSERT(inputs.size() > 1, "Invalid RelUnionAll input size");
 
     const auto &schema = inputs[0]->output();
     std::for_each(inputs.begin() + 1, inputs.end(),
                   [&schema](const auto &input) {
-                    CURA_ASSERT(input, "Invalid RelUnionAll input");
-                    CURA_ASSERT(input->output() == schema,
+                    ARA_ASSERT(input, "Invalid RelUnionAll input");
+                    ARA_ASSERT(input->output() == schema,
                                 "Mismatched RelUnionAll input schema");
                   });
   }
@@ -135,12 +135,12 @@ enum class JoinType : int32_t { APPLY_FOR_JOIN_TYPES(DEF_JOIN_TYPE_ENUM) };
 inline std::string joinTypeToString(JoinType join_type) {
 #define JOIN_TYPE_CASE(TYPE)                                                   \
   case JoinType::TYPE:                                                         \
-    return CURA_STRINGIFY(TYPE);
+    return ARA_STRINGIFY(TYPE);
 
   switch (join_type) {
     APPLY_FOR_JOIN_TYPES(JOIN_TYPE_CASE);
   default:
-    CURA_FAIL("Unknown join type " +
+    ARA_FAIL("Unknown join type " +
               std::to_string(static_cast<int32_t>(join_type)));
   }
 
@@ -149,13 +149,13 @@ inline std::string joinTypeToString(JoinType join_type) {
 
 inline JoinType joinTypeFromString(const std::string &s) {
 #define JOIN_TYPE_CASE(TYPE)                                                   \
-  if (s == CURA_STRINGIFY(TYPE)) {                                             \
+  if (s == ARA_STRINGIFY(TYPE)) {                                             \
     return JoinType::TYPE;                                                     \
   }
 
   APPLY_FOR_JOIN_TYPES(JOIN_TYPE_CASE)
 
-  CURA_FAIL("Invalid join type: " + s);
+  ARA_FAIL("Invalid join type: " + s);
 
 #undef JOIN_TYPE_CASE
 }
@@ -175,7 +175,7 @@ inline BuildSide buildSideFromString(const std::string &s) {
     return BuildSide::RIGHT;
   }
 
-  CURA_FAIL("Invalid build gtype: " + s);
+  ARA_FAIL("Invalid build gtype: " + s);
 }
 
 struct RelHashJoin : public Rel {
@@ -184,7 +184,7 @@ struct RelHashJoin : public Rel {
               std::shared_ptr<const Expression> cond_)
       : Rel({left, right}), join_type(join_type_), build_side(build_side_),
         cond(cond_) {
-    CURA_ASSERT(cond, "Invalid RelHashJoin condition");
+    ARA_ASSERT(cond, "Invalid RelHashJoin condition");
     const auto &left_output = left->output();
     const auto &right_output = right->output();
     if (join_type == JoinType::FULL) {
@@ -247,8 +247,8 @@ struct RelHashJoinBuild : public Rel {
   RelHashJoinBuild(std::shared_ptr<const Rel> input,
                    std::vector<std::shared_ptr<const ColumnRef>> keys_)
       : Rel({input}), keys(std::move(keys_)) {
-    CURA_ASSERT(input, "Invalid RelHashJoinBuild input");
-    CURA_ASSERT(!keys.empty(), "Empty keys for RelHashJoinBuild");
+    ARA_ASSERT(input, "Invalid RelHashJoinBuild input");
+    ARA_ASSERT(!keys.empty(), "Empty keys for RelHashJoinBuild");
   }
 
   const Schema &output() const override { return inputs[0]->output(); }
@@ -270,10 +270,10 @@ struct RelHashJoinProbe : public Rel {
                    Schema schema_, BuildSide build_side_)
       : Rel({probe, build}), join_type(join_type_), keys(std::move(keys_)),
         schema(std::move(schema_)), build_side(build_side_) {
-    CURA_ASSERT(inputs[0], "Invalid probe side of RelHashJoinProbe");
-    CURA_ASSERT(std::dynamic_pointer_cast<const RelHashJoinBuild>(inputs[1]),
+    ARA_ASSERT(inputs[0], "Invalid probe side of RelHashJoinProbe");
+    ARA_ASSERT(std::dynamic_pointer_cast<const RelHashJoinBuild>(inputs[1]),
                 "Invalid build side of RelHashJoinProbe");
-    CURA_ASSERT(!keys.empty(), "Empty keys for RelHashJoinProbe");
+    ARA_ASSERT(!keys.empty(), "Empty keys for RelHashJoinProbe");
   }
 
   const Schema &output() const override { return schema; }
@@ -303,8 +303,8 @@ struct RelProject : public Rel {
   RelProject(std::shared_ptr<const Rel> input,
              std::vector<std::shared_ptr<const Expression>> expressions)
       : Rel({input}), expressions_(std::move(expressions)) {
-    CURA_ASSERT(input, "Invalid RelProject input");
-    CURA_ASSERT(!expressions_.empty(), "Empty RelProject expressions");
+    ARA_ASSERT(input, "Invalid RelProject input");
+    ARA_ASSERT(!expressions_.empty(), "Empty RelProject expressions");
 
     schema.resize(expressions_.size());
     std::transform(expressions_.begin(), expressions_.end(), schema.begin(),
@@ -340,8 +340,8 @@ struct RelAggregate : public Rel {
                std::vector<std::shared_ptr<const Expression>> aggregations)
       : Rel({input}), groups_(std::move(groups)),
         aggregations_(std::move(aggregations)) {
-    CURA_ASSERT(input, "Invalid RelAggregate input");
-    CURA_ASSERT(!aggregations_.empty(), "Empty RelAggregate aggregates");
+    ARA_ASSERT(input, "Invalid RelAggregate input");
+    ARA_ASSERT(!aggregations_.empty(), "Empty RelAggregate aggregates");
 
     schema.resize(groups_.size() + aggregations_.size());
     std::transform(groups_.begin(), groups_.end(), schema.begin(),
@@ -411,8 +411,8 @@ struct SortInfo {
 struct RelSort : public Rel {
   RelSort(std::shared_ptr<const Rel> input, std::vector<SortInfo> sort_infos_)
       : Rel({input}), sort_infos(std::move(sort_infos_)) {
-    CURA_ASSERT(input, "Invalid RelSort input");
-    CURA_ASSERT(!sort_infos.empty(), "Empty RelSort sort infos");
+    ARA_ASSERT(input, "Invalid RelSort input");
+    ARA_ASSERT(!sort_infos.empty(), "Empty RelSort sort infos");
   }
 
   const Schema &output() const override { return inputs[0]->output(); }
@@ -438,7 +438,7 @@ private:
 struct RelLimit : public Rel {
   RelLimit(std::shared_ptr<const Rel> input, size_t offset, size_t n)
       : Rel({input}), offset_(offset), n_(n) {
-    CURA_ASSERT(input, "Invalid RelLimit input");
+    ARA_ASSERT(input, "Invalid RelLimit input");
   }
 
   const Schema &output() const override { return inputs[0]->output(); }
@@ -460,4 +460,4 @@ private:
   size_t n_;
 };
 
-} // namespace cura::relational
+} // namespace ara::relational

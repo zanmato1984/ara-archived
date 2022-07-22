@@ -5,7 +5,7 @@
 #include "pipeline_generator.h"
 #include "validators.h"
 
-namespace cura::planning {
+namespace ara::planning {
 
 std::list<std::unique_ptr<Pipeline>>
 Planner::plan(const std::shared_ptr<const Rel> &rel) const {
@@ -28,7 +28,7 @@ std::vector<std::string> Planner::explain(const std::shared_ptr<const Rel> &rel,
   ColumnRefValidator().visit(rel);
 
   /// Header.
-  auto result = std::vector<std::string>{"CURA CPU Plan"};
+  auto result = std::vector<std::string>{"ARA Plan"};
 
   /// Logical explain of the given Rel.
   {
@@ -56,4 +56,4 @@ std::vector<std::string> Planner::explain(const std::shared_ptr<const Rel> &rel,
   return result;
 }
 
-} // namespace cura::planning
+} // namespace ara::planning

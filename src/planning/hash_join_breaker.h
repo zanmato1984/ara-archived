@@ -2,7 +2,7 @@
 
 #include "rel_deep_copy_visitor.h"
 
-namespace cura::planning {
+namespace ara::planning {
 
 /// Break HashJoin within the given Rel.
 struct HashJoinBreaker : public RelDeepCopyVisitor<HashJoinBreaker> {
@@ -12,4 +12,4 @@ struct HashJoinBreaker : public RelDeepCopyVisitor<HashJoinBreaker> {
                    const std::vector<std::shared_ptr<const Rel>> &children);
 };
 
-} // namespace cura::planning
+} // namespace ara::planning

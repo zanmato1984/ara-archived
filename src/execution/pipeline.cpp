@@ -7,13 +7,13 @@
 #include <sstream>
 #include <string>
 
-namespace cura::execution {
+namespace ara::execution {
 
 namespace detail {
 
-using cura::kernel::Kernel;
-using cura::kernel::StreamKernel;
-using cura::type::Schema;
+using ara::kernel::Kernel;
+using ara::kernel::StreamKernel;
+using ara::type::Schema;
 
 struct Node {
   std::vector<std::pair<std::shared_ptr<Node>, size_t>> children;
@@ -72,7 +72,7 @@ std::shared_ptr<Node> buildTree(const Pipeline &pipeline) {
 
   for (auto source_id : pipeline.source_ids) {
     auto source_it = pipeline.sources.find(source_id);
-    CURA_ASSERT(source_it != pipeline.sources.end(),
+    ARA_ASSERT(source_it != pipeline.sources.end(),
                 "Source " + std::to_string(source_id) + " not found");
     auto source_kernel = source_it->second;
     children.emplace_back(std::make_shared<Node>(source_kernel));
@@ -127,7 +127,7 @@ void stringifyTreeHorizontal(
   size_t first_line = 1, last_line = 0;
   for (size_t i = 0; i < root->children.size(); i++) {
     auto line_it = line_map.find(root->children[i].first);
-    CURA_ASSERT(line_it != line_map.end(),
+    ARA_ASSERT(line_it != line_map.end(),
                 "Couldn't find line for kernel " +
                     root->children[i].first->kernel->toString());
     auto line_id = line_it->second;
@@ -135,7 +135,7 @@ void stringifyTreeHorizontal(
       first_line = line_id;
       last_line = line_id;
     } else {
-      CURA_ASSERT(last_line < line_it->second,
+      ARA_ASSERT(last_line < line_it->second,
                   "Invalid line for kernel " +
                       root->children[i].first->kernel->toString());
       last_line = line_id;
@@ -170,9 +170,9 @@ Pipeline::Pipeline(PipelineId id_, bool is_final_,
                    std::shared_ptr<Terminal> terminal_)
     : id(id_), is_final(is_final_), terminal(terminal_), current_source(0) {
   if (is_final) {
-    CURA_ASSERT(!terminal, "Final pipeline must not have terminal");
+    ARA_ASSERT(!terminal, "Final pipeline must not have terminal");
   } else {
-    CURA_ASSERT(terminal, "No terminal in a non-final pipeline");
+    ARA_ASSERT(terminal, "No terminal in a non-final pipeline");
   }
 
   for (const auto &source : sources_) {
@@ -185,15 +185,15 @@ Pipeline::Pipeline(PipelineId id_, bool is_final_,
 bool Pipeline::hasNextSource() const { return current_source < sources.size(); }
 
 SourceId Pipeline::nextSource() {
-  CURA_ASSERT(hasNextSource(), "No source left in pipeline");
+  ARA_ASSERT(hasNextSource(), "No source left in pipeline");
   return source_ids[current_source++];
 }
 
 void Pipeline::push(const Context &ctx, ThreadId thread_id, SourceId source_id,
                     std::shared_ptr<const Fragment> fragment) {
-  CURA_ASSERT(!is_final, "push is not allowed for a final pipeline");
+  ARA_ASSERT(!is_final, "push is not allowed for a final pipeline");
   if (isHeapSourceId(source_id)) {
-    CURA_ASSERT(!fragment,
+    ARA_ASSERT(!fragment,
                 "push an heap source with not-null fragment is not allowed");
   }
   getSource(source_id)->push(ctx, thread_id, VoidKernelId, fragment);
@@ -202,9 +202,9 @@ void Pipeline::push(const Context &ctx, ThreadId thread_id, SourceId source_id,
 std::shared_ptr<const Fragment>
 Pipeline::stream(const Context &ctx, ThreadId thread_id, SourceId source_id,
                  std::shared_ptr<const Fragment> fragment, size_t rows) const {
-  CURA_ASSERT(is_final, "stream is not allowed for a non-final pipeline");
+  ARA_ASSERT(is_final, "stream is not allowed for a non-final pipeline");
   if (isHeapSourceId(source_id)) {
-    CURA_ASSERT(!fragment,
+    ARA_ASSERT(!fragment,
                 "stream an heap source with not-null fragment is not allowed");
   }
   return getSource(source_id)->stream(ctx, thread_id, VoidKernelId, fragment,
@@ -232,9 +232,9 @@ std::string Pipeline::toString() const {
 
 std::shared_ptr<const Source> Pipeline::getSource(SourceId source_id) const {
   auto source_it = sources.find(source_id);
-  CURA_ASSERT(source_it != sources.end(),
+  ARA_ASSERT(source_it != sources.end(),
               "Source " + std::to_string(source_id) + " not found");
   return source_it->second;
 }
 
-} // namespace cura::execution
+} // namespace ara::execution

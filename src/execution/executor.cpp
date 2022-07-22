@@ -2,7 +2,7 @@
 #include "ara/common/errors.h"
 #include "ara/kernel/kernel.h"
 
-namespace cura::execution {
+namespace ara::execution {
 
 bool Executor::hasNextPipeline() const { return !pipelines.empty(); }
 
@@ -51,8 +51,8 @@ Executor::pipelineStream(ThreadId thread_id, SourceId source_id,
 }
 
 Pipeline &Executor::currentPipeline() const {
-  CURA_ASSERT(hasNextPipeline(), "No pipeline left in executor");
+  ARA_ASSERT(hasNextPipeline(), "No pipeline left in executor");
   return *pipelines.front();
 }
 
-} // namespace cura::execution
+} // namespace ara::execution

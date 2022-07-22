@@ -4,11 +4,11 @@
 #include <cudf/copying.hpp>
 #include <cudf/utilities/error.hpp>
 
-namespace cura::expression::detail {
+namespace ara::expression::detail {
 
-using cura::data::ColumnVectorCudfColumn;
-using cura::data::createCudfColumnVector;
-using cura::type::TypeId;
+using ara::data::ColumnVectorCudfColumn;
+using ara::data::createCudfColumnVector;
+using ara::type::TypeId;
 
 struct DeviceExtractYear {
   __device__ int64_t operator()(int64_t data) {
@@ -21,9 +21,9 @@ std::shared_ptr<const Column>
 extractYear(const Context &ctx, ThreadId thread_id,
             std::shared_ptr<const ColumnVector> cv,
             const DataType &result_type) {
-  CURA_ASSERT(cv->dataType().type_id == TypeId::INT64,
+  ARA_ASSERT(cv->dataType().type_id == TypeId::INT64,
               "Extract year requires int64 operand");
-  CURA_ASSERT(result_type.type_id == TypeId::INT64,
+  ARA_ASSERT(result_type.type_id == TypeId::INT64,
               "Extract year's result should be int64");
 
   auto input = cv->cudf();
@@ -54,4 +54,4 @@ extractYear(const Context &ctx, ThreadId thread_id,
                                                         std::move(output));
 }
 
-} // namespace cura::expression::detail
+} // namespace ara::expression::detail

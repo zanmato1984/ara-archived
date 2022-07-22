@@ -3,13 +3,13 @@
 #include "ara/common/types.h"
 #include "ara/execution/memory_resource.h"
 
-namespace cura::driver {
+namespace ara::driver {
 struct Option;
-} // namespace cura::driver
+} // namespace ara::driver
 
-namespace cura::execution {
+namespace ara::execution {
 
-using cura::driver::Option;
+using ara::driver::Option;
 
 struct Context {
   Context(const Option &option_);
@@ -18,4 +18,4 @@ struct Context {
   std::unique_ptr<MemoryResource> memory_resource;
 };
 
-} // namespace cura::execution
+} // namespace ara::execution

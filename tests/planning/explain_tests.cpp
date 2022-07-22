@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-using cura::driver::Option;
-using cura::planning::Planner;
+using ara::driver::Option;
+using ara::planning::Planner;
 
 void testPlanner(std::shared_ptr<const Rel> rel) {
   Option option;

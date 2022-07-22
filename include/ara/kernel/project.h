@@ -3,11 +3,11 @@
 #include "ara/expression/expressions.h"
 #include "ara/kernel/kernel.h"
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::type::Schema;
+using ara::type::Schema;
 
-using cura::expression::Expression;
+using ara::expression::Expression;
 
 struct Project : NonSourceStreamKernel {
   Project(KernelId id,
@@ -35,4 +35,4 @@ private:
   std::vector<std::shared_ptr<const Expression>> expressions;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

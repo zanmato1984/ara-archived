@@ -4,9 +4,9 @@
 
 #include <functional>
 
-namespace cura::test::database {
+namespace ara::test::database {
 
-using cura::data::Fragment;
+using ara::data::Fragment;
 
 struct PrintArrowArrayPerLineSink {
   static void sink(const Fragment &fragment) {
@@ -27,4 +27,4 @@ struct PrintArrowArrayPerLineSink {
   }
 };
 
-} // namespace cura::test::database
+} // namespace ara::test::database

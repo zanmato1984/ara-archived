@@ -6,22 +6,22 @@
 
 #include <gtest/gtest.h>
 
-using cura::VoidKernelId;
-using cura::VoidThreadId;
-using cura::data::Fragment;
-using cura::execution::Context;
-using cura::expression::AggregationOperator;
-using cura::expression::ColumnIdx;
-using cura::kernel::Aggregate;
-using cura::kernel::HeapSource;
-using cura::kernel::PhysicalAggregation;
-using cura::test::data::makeDirectColumnScalar;
-using cura::test::data::makeDirectColumnVector;
-using cura::test::data::makeDirectColumnVectorN;
-using cura::test::data::makeFragment;
-using cura::type::DataType;
-using cura::type::Schema;
-using cura::type::TypeId;
+using ara::VoidKernelId;
+using ara::VoidThreadId;
+using ara::data::Fragment;
+using ara::execution::Context;
+using ara::expression::AggregationOperator;
+using ara::expression::ColumnIdx;
+using ara::kernel::Aggregate;
+using ara::kernel::HeapSource;
+using ara::kernel::PhysicalAggregation;
+using ara::test::data::makeDirectColumnScalar;
+using ara::test::data::makeDirectColumnVector;
+using ara::test::data::makeDirectColumnVectorN;
+using ara::test::data::makeFragment;
+using ara::type::DataType;
+using ara::type::Schema;
+using ara::type::TypeId;
 
 std::shared_ptr<Aggregate> makeAggregateWithoutKey(AggregationOperator op,
                                                    DataType agg_in_type,
@@ -84,8 +84,8 @@ TEST(AggregateTest, Sum) {
         DataType::int64Type(true), {1, 2, 0}, {true, true, false});
     auto expected1 = makeDirectColumnVector<int64_t>(
         DataType::int64Type(true), {0, 84, 42}, {false, true, true});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
   }
   {
     Aggregator aggregator;
@@ -104,7 +104,7 @@ TEST(AggregateTest, Sum) {
 
     auto expected = makeDirectColumnVector<int64_t>(DataType::int64Type(true),
                                                     {126}, {true});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
   }
 }
 
@@ -131,8 +131,8 @@ TEST(AggregateTest, Min) {
         DataType::int64Type(true), {1, 2, 0}, {true, true, false});
     auto expected1 = makeDirectColumnVector<int32_t>(
         DataType::int32Type(true), {0, 42, 44}, {false, true, true});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
   }
   {
     Aggregator aggregator;
@@ -151,7 +151,7 @@ TEST(AggregateTest, Min) {
 
     auto expected = makeDirectColumnVector<int32_t>(DataType::int32Type(true),
                                                     {42}, {true});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
   }
 }
 
@@ -178,8 +178,8 @@ TEST(AggregateTest, Max) {
         DataType::int64Type(true), {1, 2, 0}, {true, true, false});
     auto expected1 =
         makeDirectColumnVector<int64_t>(DataType::int64Type(), {41, 43, 44});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
   }
   {
     Aggregator aggregator;
@@ -198,7 +198,7 @@ TEST(AggregateTest, Max) {
 
     auto expected =
         makeDirectColumnVector<int32_t>(DataType::int32Type(), {44});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
   }
 }
 
@@ -225,8 +225,8 @@ TEST(AggregateTest, CountValid) {
         DataType::int64Type(true), {1, 2, 0}, {true, true, false});
     auto expected1 =
         makeDirectColumnVector<int64_t>(DataType::int64Type(), {0, 2, 1});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
   }
   {
     Aggregator aggregator;
@@ -244,7 +244,7 @@ TEST(AggregateTest, CountValid) {
     ASSERT_EQ(res->size(), 1);
 
     auto expected = makeDirectColumnVector<int64_t>(DataType::int64Type(), {3});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
   }
 }
 
@@ -271,8 +271,8 @@ TEST(AggregateTest, CountAll) {
         DataType::int64Type(true), {1, 2, 0}, {true, true, false});
     auto expected1 =
         makeDirectColumnVector<int64_t>(DataType::int64Type(), {2, 2, 2});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
   }
   {
     Aggregator aggregator;
@@ -290,7 +290,7 @@ TEST(AggregateTest, CountAll) {
     ASSERT_EQ(res->size(), 1);
 
     auto expected = makeDirectColumnVector<int64_t>(DataType::int64Type(), {6});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
   }
 }
 
@@ -317,8 +317,8 @@ TEST(AggregateTest, Mean) {
         DataType::int64Type(true), {1, 2, 0}, {true, true, false});
     auto expected1 = makeDirectColumnVector<double>(
         DataType::float64Type(true), {0, 42.5, 44}, {false, true, true});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
   }
   {
     Aggregator aggregator;
@@ -337,7 +337,7 @@ TEST(AggregateTest, Mean) {
 
     auto expected =
         makeDirectColumnVector<double>(DataType::float64Type(), {43});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
   }
 }
 
@@ -371,10 +371,10 @@ TEST(AggregateTest, CountLiteral) {
 
   auto seven = makeDirectColumnVector<int64_t>(DataType::int64Type(), {7});
   auto zero = makeDirectColumnVector<int64_t>(DataType::int64Type(), {0});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(seven, res->column(0));
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(seven, res->column(1));
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(zero, res->column(2));
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(seven, res->column(3));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(seven, res->column(0));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(seven, res->column(1));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(zero, res->column(2));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(seven, res->column(3));
 }
 
 TEST(AggregateTest, NthElement) {
@@ -400,8 +400,8 @@ TEST(AggregateTest, NthElement) {
         DataType::int64Type(true), {1, 2, 0}, {true, true, false});
     auto expected1 = makeDirectColumnVector<int32_t>(
         DataType::int32Type(true), {0, 42, 0}, {false, true, false});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
   }
   {
     Aggregator aggregator;
@@ -420,7 +420,7 @@ TEST(AggregateTest, NthElement) {
 
     auto expected = makeDirectColumnVector<int32_t>(DataType::int32Type(true),
                                                     {0}, {false});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
   }
   {
     Aggregator aggregator;
@@ -438,6 +438,6 @@ TEST(AggregateTest, NthElement) {
 
     auto expected = makeDirectColumnVector<int32_t>(DataType::int32Type(true),
                                                     {0}, {false});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
+    ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected, res->column(0));
   }
 }

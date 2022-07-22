@@ -7,20 +7,20 @@
 #include <unordered_map>
 #include <vector>
 
-namespace cura::data {
+namespace ara::data {
 struct Fragment;
-} // namespace cura::data
+} // namespace ara::data
 
-namespace cura::kernel {
+namespace ara::kernel {
 struct Source;
 struct Terminal;
-} // namespace cura::kernel
+} // namespace ara::kernel
 
-namespace cura::execution {
+namespace ara::execution {
 
-using cura::data::Fragment;
-using cura::kernel::Source;
-using cura::kernel::Terminal;
+using ara::data::Fragment;
+using ara::kernel::Source;
+using ara::kernel::Terminal;
 
 class Pipeline {
 public:
@@ -62,4 +62,4 @@ private:
   friend class Executor;
 };
 
-} // namespace cura::execution
+} // namespace ara::execution

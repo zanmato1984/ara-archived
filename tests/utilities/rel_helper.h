@@ -2,9 +2,9 @@
 
 #include "ara/relational/rels.h"
 
-namespace cura::test::relational {
+namespace ara::test::relational {
 
-using cura::relational::Rel;
+using ara::relational::Rel;
 
 template <typename RelType, typename... Args>
 inline std::shared_ptr<const Rel> makeRel(Args &&... args) {
@@ -13,4 +13,4 @@ inline std::shared_ptr<const Rel> makeRel(Args &&... args) {
 
 std::string toJson(std::shared_ptr<const Rel> rel);
 
-} // namespace cura::test::relational
+} // namespace ara::test::relational

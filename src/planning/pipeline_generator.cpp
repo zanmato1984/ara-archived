@@ -11,31 +11,31 @@
 #include "ara/kernel/sources.h"
 #include "ara/kernel/unions.h"
 
-namespace cura::planning {
+namespace ara::planning {
 
-using cura::expression::Aggregation;
-using cura::expression::ColumnIdx;
-using cura::expression::ColumnRef;
-using cura::expression::NthElement;
-using cura::kernel::Aggregate;
-using cura::kernel::BucketAggregate;
-using cura::kernel::Filter;
-using cura::kernel::HashJoinProbe;
-using cura::kernel::HeapNonStreamKernel;
-using cura::kernel::HeapSource;
-using cura::kernel::InputSource;
-using cura::kernel::Limit;
-using cura::kernel::NonStreamKernel;
-using cura::kernel::NonTerminalKernel;
-using cura::kernel::PhysicalAggregation;
-using cura::kernel::PhysicalSortInfo;
-using cura::kernel::Project;
-using cura::kernel::Sort;
-using cura::kernel::StreamKernel;
-using cura::kernel::Terminal;
-using cura::kernel::Union;
-using cura::kernel::UnionAll;
-using cura::relational::SortInfo;
+using ara::expression::Aggregation;
+using ara::expression::ColumnIdx;
+using ara::expression::ColumnRef;
+using ara::expression::NthElement;
+using ara::kernel::Aggregate;
+using ara::kernel::BucketAggregate;
+using ara::kernel::Filter;
+using ara::kernel::HashJoinProbe;
+using ara::kernel::HeapNonStreamKernel;
+using ara::kernel::HeapSource;
+using ara::kernel::InputSource;
+using ara::kernel::Limit;
+using ara::kernel::NonStreamKernel;
+using ara::kernel::NonTerminalKernel;
+using ara::kernel::PhysicalAggregation;
+using ara::kernel::PhysicalSortInfo;
+using ara::kernel::Project;
+using ara::kernel::Sort;
+using ara::kernel::StreamKernel;
+using ara::kernel::Terminal;
+using ara::kernel::Union;
+using ara::kernel::UnionAll;
+using ara::relational::SortInfo;
 
 namespace detail {
 
@@ -101,7 +101,7 @@ std::list<std::unique_ptr<Pipeline>>
 PipelineGenerator::genPipelines(const std::shared_ptr<const Rel> &rel) && {
   auto kernel = visit(rel);
   auto it = pipeline_chains.find(kernel);
-  CURA_ASSERT(it != pipeline_chains.end(),
+  ARA_ASSERT(it != pipeline_chains.end(),
               "Couldn't find kernel for rel node: " + rel->toString());
   auto &pipeline_chain = it->second;
   std::reverse(pipeline_chain.closed_pipelines.begin(),
@@ -109,7 +109,7 @@ PipelineGenerator::genPipelines(const std::shared_ptr<const Rel> &rel) && {
 
   std::list<std::unique_ptr<Pipeline>> pipelines;
   for (auto &pipeline : pipeline_chain.closed_pipelines) {
-    CURA_ASSERT(!pipeline.non_streams.empty(),
+    ARA_ASSERT(!pipeline.non_streams.empty(),
                 "Closed pipeline with no non-stream kernel");
     auto terminal = makeKernel<Terminal>(std::move(pipeline.non_streams));
     pipelines.emplace_back(std::make_unique<Pipeline>(
@@ -150,7 +150,7 @@ std::shared_ptr<Kernel> PipelineGenerator::visitUnionAll(
 std::shared_ptr<Kernel> PipelineGenerator::visitHashJoin(
     const std::shared_ptr<const RelHashJoin> &hash_join,
     const std::vector<std::shared_ptr<Kernel>> &children) {
-  CURA_FAIL("Pipeline generator shouldn't see RelHashJoin node directly");
+  ARA_FAIL("Pipeline generator shouldn't see RelHashJoin node directly");
 }
 
 std::shared_ptr<Kernel> PipelineGenerator::visitHashJoinBuild(
@@ -170,7 +170,7 @@ std::shared_ptr<Kernel> PipelineGenerator::visitHashJoinProbe(
     const std::shared_ptr<const RelHashJoinProbe> &hash_join_probe,
     const std::vector<std::shared_ptr<Kernel>> &children) {
   auto it = hash_join_build_kernels.find(hash_join_probe->buildInput());
-  CURA_ASSERT(it != hash_join_build_kernels.end(),
+  ARA_ASSERT(it != hash_join_build_kernels.end(),
               "Corresponding hash join build kernel not found");
   std::vector<ColumnIdx> keys;
   for (const auto &key : hash_join_probe->probeKeys()) {
@@ -196,7 +196,7 @@ std::shared_ptr<Kernel> PipelineGenerator::visitAggregate(
   std::transform(aggregate->groups().begin(), aggregate->groups().end(),
                  keys.begin(), [](const auto &e) {
                    auto col_ref = std::dynamic_pointer_cast<const ColumnRef>(e);
-                   CURA_ASSERT(col_ref, "Aggregate group must be ColumnRef");
+                   ARA_ASSERT(col_ref, "Aggregate group must be ColumnRef");
                    return col_ref->columnIdx();
                  });
   std::vector<PhysicalAggregation> aggregations(
@@ -205,10 +205,10 @@ std::shared_ptr<Kernel> PipelineGenerator::visitAggregate(
       aggregate->aggregations().begin(), aggregate->aggregations().end(),
       aggregations.begin(), [](const auto &e) {
         auto aggregation = std::dynamic_pointer_cast<const Aggregation>(e);
-        CURA_ASSERT(aggregation, "Aggregate aggregation must be Aggregation");
+        ARA_ASSERT(aggregation, "Aggregate aggregation must be Aggregation");
         auto col_ref = std::dynamic_pointer_cast<const ColumnRef>(
             aggregation->operands()[0]);
-        CURA_ASSERT(col_ref,
+        ARA_ASSERT(col_ref,
                     "Aggregate aggregation must be applied to ColumnRef");
         int64_t n = 0;
         if (auto nth_element =
@@ -243,7 +243,7 @@ std::shared_ptr<Kernel> PipelineGenerator::visitSort(
       [](const auto &sort_info) {
         auto col_ref =
             std::dynamic_pointer_cast<const ColumnRef>(sort_info.expression);
-        CURA_ASSERT(col_ref, "SortInfo expression must be ColumnRef");
+        ARA_ASSERT(col_ref, "SortInfo expression must be ColumnRef");
         return PhysicalSortInfo{col_ref->columnIdx(), sort_info.order,
                                 sort_info.null_order};
       });
@@ -261,22 +261,22 @@ std::shared_ptr<Kernel> PipelineGenerator::visitLimit(
 std::shared_ptr<Kernel> PipelineGenerator::combineResult(
     const std::shared_ptr<Kernel> &parent,
     const std::vector<std::shared_ptr<Kernel>> &children) {
-  CURA_ASSERT(parent, "Empty kernel");
+  ARA_ASSERT(parent, "Empty kernel");
 
   std::vector<detail::PipelineChain> child_pipeline_chains;
 
   for (const auto &child : children) {
-    CURA_ASSERT(child, "Empty kernel");
+    ARA_ASSERT(child, "Empty kernel");
 
     if (auto stream = std::dynamic_pointer_cast<StreamKernel>(child); stream) {
       auto non_terminal = std::dynamic_pointer_cast<NonTerminalKernel>(parent);
-      CURA_ASSERT(non_terminal,
+      ARA_ASSERT(non_terminal,
                   "Meet terminal kernel during pipeline generation");
       stream->downstream = non_terminal;
     }
 
     auto it = pipeline_chains.find(child);
-    CURA_ASSERT(it != pipeline_chains.end(), "Kernel not found");
+    ARA_ASSERT(it != pipeline_chains.end(), "Kernel not found");
     child_pipeline_chains.emplace_back(std::move(it->second));
     pipeline_chains.erase(it);
   }
@@ -295,9 +295,9 @@ std::shared_ptr<Kernel> PipelineGenerator::combineResult(
   } else if (auto non_stream =
                  std::dynamic_pointer_cast<NonStreamKernel>(parent);
              non_stream) {
-    CURA_ASSERT(parent_pipeline_chain.open_pipeline,
+    ARA_ASSERT(parent_pipeline_chain.open_pipeline,
                 "Dangling non-stream kernel");
-    CURA_ASSERT(parent_pipeline_chain.open_pipeline.value().non_streams.empty(),
+    ARA_ASSERT(parent_pipeline_chain.open_pipeline.value().non_streams.empty(),
                 "Open pipeline contains non-stream kernels");
 
     parent_pipeline_chain.open_pipeline.value().non_streams.emplace_back(
@@ -315,7 +315,7 @@ std::shared_ptr<Kernel> PipelineGenerator::combineResult(
       next_parent = heap_source;
     }
   } else {
-    CURA_FAIL("Neither stream nor non-stream kernel");
+    ARA_FAIL("Neither stream nor non-stream kernel");
   }
 
   pipeline_chains.emplace(next_parent, std::move(parent_pipeline_chain));
@@ -323,4 +323,4 @@ std::shared_ptr<Kernel> PipelineGenerator::combineResult(
   return next_parent;
 }
 
-} // namespace cura::planning
+} // namespace ara::planning

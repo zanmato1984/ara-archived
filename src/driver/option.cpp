@@ -1,6 +1,6 @@
 #include "ara/driver/option.h"
 
-namespace cura::driver {
+namespace ara::driver {
 
 /// Defaults.
 constexpr int8_t default_memory_resource = 0;
@@ -30,4 +30,4 @@ Option::Option()
       bucket_aggregate(default_bucket_aggregate),
       bucket_aggregate_buckets(default_bucket_aggregate_buckets) {}
 
-} // namespace cura::driver
+} // namespace ara::driver

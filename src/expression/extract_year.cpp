@@ -3,25 +3,25 @@
 
 #include <arrow/api.h>
 
-namespace cura::expression::detail {
+namespace ara::expression::detail {
 
-using cura::data::createArrowColumnVector;
-using cura::type::TypeId;
+using ara::data::createArrowColumnVector;
+using ara::type::TypeId;
 
 std::shared_ptr<const Column>
 extractYear(const Context &ctx, ThreadId thread_id,
             std::shared_ptr<const ColumnVector> cv,
             const DataType &result_type) {
-  CURA_ASSERT(cv->dataType().type_id == TypeId::INT64,
+  ARA_ASSERT(cv->dataType().type_id == TypeId::INT64,
               "Extract year requires int64 operand");
-  CURA_ASSERT(result_type.type_id == TypeId::INT64,
+  ARA_ASSERT(result_type.type_id == TypeId::INT64,
               "Extract year's result should be int64");
 
   const auto &input_array = cv->arrow();
   auto output_array = [&]() {
     std::vector<std::shared_ptr<arrow::Buffer>> buffers;
     buffers.emplace_back(input_array->null_bitmap());
-    auto buf = CURA_GET_ARROW_RESULT(
+    auto buf = ARA_GET_ARROW_RESULT(
         arrow::AllocateBuffer(cv->size() * sizeof(int64_t),
                               ctx.memory_resource->preConcatenate(thread_id)));
     buffers.emplace_back(std::move(buf));
@@ -40,4 +40,4 @@ extractYear(const Context &ctx, ThreadId thread_id,
   return createArrowColumnVector(result_type, output_array);
 }
 
-} // namespace cura::expression::detail
+} // namespace ara::expression::detail

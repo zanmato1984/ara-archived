@@ -7,19 +7,19 @@
 #include <gtest/gtest.h>
 #include <numeric>
 
-using cura::data::ColumnVector;
-using cura::driver::Option;
-using cura::execution::Context;
-using cura::expression::BinaryOp;
-using cura::expression::BinaryOperator;
-using cura::expression::ColumnRef;
-using cura::expression::Literal;
-using cura::expression::TiUnaryOp;
-using cura::test::data::makeDirectColumnVector;
-using cura::test::data::makeDirectColumnVectorN;
-using cura::test::data::makeFragment;
-using cura::type::DataType;
-using cura::type::TypeId;
+using ara::data::ColumnVector;
+using ara::driver::Option;
+using ara::execution::Context;
+using ara::expression::BinaryOp;
+using ara::expression::BinaryOperator;
+using ara::expression::ColumnRef;
+using ara::expression::Literal;
+using ara::expression::TiUnaryOp;
+using ara::test::data::makeDirectColumnVector;
+using ara::test::data::makeDirectColumnVectorN;
+using ara::test::data::makeFragment;
+using ara::type::DataType;
+using ara::type::TypeId;
 
 TEST(ExpressionTest, VectorAddVector) {
   Option option;
@@ -45,7 +45,7 @@ TEST(ExpressionTest, VectorAddVector) {
 
   auto expected =
       makeDirectColumnVector<int32_t>(DataType::int32Type(), {2, 5, 8, 11, 14});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+  ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
 }
 
 TEST(ExpressionTest, VectorCompareLiteralInt32) {
@@ -78,7 +78,7 @@ TEST(ExpressionTest, VectorCompareLiteralInt32) {
     auto expected = makeDirectColumnVector<bool>(
         DataType::bool8Type(),
         reinterpret_cast<std::vector<bool> &&>(result[i]));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
   }
 }
 
@@ -114,7 +114,7 @@ TEST(ExpressionTest, VectorCompareLiteralString) {
     auto expected = makeDirectColumnVector<bool>(
         DataType::bool8Type(),
         reinterpret_cast<std::vector<bool> &&>(result[i]));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
   }
 }
 
@@ -145,7 +145,7 @@ TEST(ExpressionTest, VectorIntCompareLiteralFloat64) {
     auto expected = makeDirectColumnVector<bool>(
         DataType::bool8Type(),
         reinterpret_cast<std::vector<bool> &&>(result[i]));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
   }
 }
 
@@ -179,7 +179,7 @@ TEST(ExpressionTest, VectorFloat32CompareLiteralInt64) {
     auto expected = makeDirectColumnVector<bool>(
         DataType::bool8Type(),
         reinterpret_cast<std::vector<bool> &&>(result[i]));
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
   }
 }
 
@@ -208,7 +208,7 @@ TEST(ExpressionTest, VectorAddVectorEqLiteral) {
   ASSERT_EQ(cv_res->size(), 5);
   auto expected = makeDirectColumnVector<bool>(
       DataType::bool8Type(), {false, true, false, false, false});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+  ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
 }
 
 TEST(ExpressionTest, VectorEqLiteralAndLiteralEqVectorAddVector) {
@@ -243,7 +243,7 @@ TEST(ExpressionTest, VectorEqLiteralAndLiteralEqVectorAddVector) {
   ASSERT_EQ(cv_res->size(), 3);
   auto expected =
       makeDirectColumnVector<bool>(DataType::bool8Type(), {false, true, false});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+  ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
 }
 
 // TODO: cudf doesn't support kleene logic so temporarily disable checking
@@ -283,7 +283,7 @@ TEST(ExpressionTest, NullableAnd) {
                                                  {true, false, false, false},
                                                  {true, true, false, false});
 #ifndef USE_CUDF
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
 #endif
   }
 
@@ -301,7 +301,7 @@ TEST(ExpressionTest, NullableAnd) {
                                                  {false, false, false, false},
                                                  {true, true, true, true});
 #ifndef USE_CUDF
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
 #endif
   }
 }
@@ -330,7 +330,7 @@ TEST(ExpressionTest, ChronoColumnAndLiteral) {
   ASSERT_EQ(cv_res->size(), 2);
   auto expected =
       makeDirectColumnVector<bool>(DataType::bool8Type(), {false, true});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+  ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
 }
 
 TEST(ExpressionTest, ExtractYearLiteral) {
@@ -361,5 +361,5 @@ TEST(ExpressionTest, ExtractYearLiteral) {
   ASSERT_EQ(cv_res->size(), 3);
   auto expected = makeDirectColumnVector<int64_t>(
       DataType::int64Type(true), {1984, 0, 1990}, {true, false, true});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
+  ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, cv_res);
 }

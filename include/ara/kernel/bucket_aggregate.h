@@ -2,7 +2,7 @@
 
 #include "ara/kernel/aggregate.h"
 
-namespace cura::kernel {
+namespace ara::kernel {
 
 struct BucketAggregate : HeapNonStreamKernel {
   BucketAggregate(KernelId id, Schema input_schema_, Schema output_schema_,
@@ -39,4 +39,4 @@ private:
   mutable std::shared_ptr<const Fragment> converged_fragment;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

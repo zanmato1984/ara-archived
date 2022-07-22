@@ -5,9 +5,9 @@
 
 #include <mutex>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::data::Fragment;
+using ara::data::Fragment;
 
 struct Source : public StreamKernel {
   explicit Source(KernelId id) : StreamKernel(id) {}
@@ -85,4 +85,4 @@ private:
   mutable size_t current_row = 0;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

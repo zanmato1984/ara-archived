@@ -6,13 +6,13 @@
 
 #include <arrow/compute/api.h>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::data::ColumnVector;
-using cura::data::createArrowColumnVector;
-using cura::type::DataType;
-using cura::type::Schema;
-using cura::type::TypeId;
+using ara::data::ColumnVector;
+using ara::data::createArrowColumnVector;
+using ara::type::DataType;
+using ara::type::Schema;
+using ara::type::TypeId;
 
 // TODO: Rewrite these shit in a mature arrow fashion, i.e., array data visitors
 // or so.
@@ -24,7 +24,7 @@ struct HashJoinImpl {
   void build(const Context &ctx,
              std::shared_ptr<const Fragment> build_fragment_,
              const std::vector<ColumnIdx> &build_keys) {
-    CURA_ASSERT(!build_fragment, "Re-entering hash join build");
+    ARA_ASSERT(!build_fragment, "Re-entering hash join build");
 
     build_fragment = build_fragment_;
     auto rows = build_fragment->size();
@@ -33,7 +33,7 @@ struct HashJoinImpl {
       for (auto key : build_keys) {
         const auto &key_col = build_fragment->column(key);
         const auto &value =
-            CURA_GET_ARROW_RESULT(key_col->arrow()->GetScalar(i));
+            ARA_GET_ARROW_RESULT(key_col->arrow()->GetScalar(i));
         key_values.emplace_back(value);
       }
       hash_table.emplace(std::move(key_values), i);
@@ -61,25 +61,25 @@ struct HashJoinImpl {
     auto rb = [&]() {
       arrow::compute::ExecContext context(
           ctx.memory_resource->preConcatenate(thread_id));
-      const auto &probe_datum = CURA_GET_ARROW_RESULT(arrow::compute::Take(
+      const auto &probe_datum = ARA_GET_ARROW_RESULT(arrow::compute::Take(
           probe_fragment->arrow(), indices.first,
           arrow::compute::TakeOptions::Defaults(), &context));
-      CURA_ASSERT(probe_datum.kind() == arrow::Datum::RECORD_BATCH,
+      ARA_ASSERT(probe_datum.kind() == arrow::Datum::RECORD_BATCH,
                   "Invalid result for join take");
       const auto &probe_rb = probe_datum.record_batch();
-      const auto &build_datum = CURA_GET_ARROW_RESULT(arrow::compute::Take(
+      const auto &build_datum = ARA_GET_ARROW_RESULT(arrow::compute::Take(
           build_fragment->arrow(), indices.second,
           arrow::compute::TakeOptions::Defaults(), &context));
-      CURA_ASSERT(build_datum.kind() == arrow::Datum::RECORD_BATCH,
+      ARA_ASSERT(build_datum.kind() == arrow::Datum::RECORD_BATCH,
                   "Invalid result for join take");
       const auto &build_rb = build_datum.record_batch();
       arrow::SchemaBuilder builder;
       for (const auto &data_type : schema) {
         auto field = std::make_shared<arrow::Field>("", data_type.arrow(),
                                                     data_type.nullable);
-        CURA_ASSERT_ARROW_OK(builder.AddField(field), "Add arrow field failed");
+        ARA_ASSERT_ARROW_OK(builder.AddField(field), "Add arrow field failed");
       }
-      const auto &arrow_schema = CURA_GET_ARROW_RESULT(builder.Finish());
+      const auto &arrow_schema = ARA_GET_ARROW_RESULT(builder.Finish());
       std::vector<std::shared_ptr<arrow::Array>> arrow_columns;
       const auto &probe_columns = probe_rb->columns();
       const auto &build_columns = build_rb->columns();
@@ -108,39 +108,39 @@ private:
         JoinType join_type) const {
     auto pool = ctx.memory_resource->preConcatenate(thread_id);
     std::unique_ptr<arrow::ArrayBuilder> probe_builder, build_builder;
-    CURA_ASSERT_ARROW_OK(
+    ARA_ASSERT_ARROW_OK(
         arrow::MakeBuilder(pool, arrow::uint64(), &probe_builder),
         "Create probe indices builder failed");
-    CURA_ASSERT_ARROW_OK(
+    ARA_ASSERT_ARROW_OK(
         arrow::MakeBuilder(pool, arrow::uint64(), &build_builder),
         "Create build indices builder failed");
     auto probe_indices_builder =
         dynamic_cast<arrow::UInt64Builder *>(probe_builder.get());
     auto build_indices_builder =
         dynamic_cast<arrow::UInt64Builder *>(build_builder.get());
-    CURA_ASSERT(probe_indices_builder,
+    ARA_ASSERT(probe_indices_builder,
                 "Dynamic cast of probe indices builder failed");
-    CURA_ASSERT(build_indices_builder,
+    ARA_ASSERT(build_indices_builder,
                 "Dynamic cast of build indices builder failed");
 
     auto rows = probe_keys.front()->size();
     for (size_t i = 0; i < rows; i++) {
       Key key;
       for (const auto &cv : probe_keys) {
-        const auto &value = CURA_GET_ARROW_RESULT(cv->arrow()->GetScalar(i));
+        const auto &value = ARA_GET_ARROW_RESULT(cv->arrow()->GetScalar(i));
         key.emplace_back(value);
       }
       auto pair = hash_table.equal_range(key);
       if (pair.first == pair.second && join_type == JoinType::LEFT) {
-        CURA_ASSERT_ARROW_OK(probe_indices_builder->Append(i),
+        ARA_ASSERT_ARROW_OK(probe_indices_builder->Append(i),
                              "Append probe indices failed");
-        CURA_ASSERT_ARROW_OK(build_indices_builder->AppendNull(),
+        ARA_ASSERT_ARROW_OK(build_indices_builder->AppendNull(),
                              "Append build indices failed");
       } else {
         while (pair.first != pair.second) {
-          CURA_ASSERT_ARROW_OK(probe_indices_builder->Append(i),
+          ARA_ASSERT_ARROW_OK(probe_indices_builder->Append(i),
                                "Append probe indices failed");
-          CURA_ASSERT_ARROW_OK(
+          ARA_ASSERT_ARROW_OK(
               build_indices_builder->Append(pair.first->second),
               "Append build indices failed");
           pair.first++;
@@ -149,9 +149,9 @@ private:
     }
 
     std::shared_ptr<arrow::Array> probe_indices, build_indices;
-    CURA_ASSERT_ARROW_OK(probe_indices_builder->Finish(&probe_indices),
+    ARA_ASSERT_ARROW_OK(probe_indices_builder->Finish(&probe_indices),
                          "Finish probe indices failed");
-    CURA_ASSERT_ARROW_OK(build_indices_builder->Finish(&build_indices),
+    ARA_ASSERT_ARROW_OK(build_indices_builder->Finish(&build_indices),
                          "Finish build indices failed");
 
     return std::make_pair(probe_indices, build_indices);
@@ -167,7 +167,7 @@ HashJoinBuild::HashJoinBuild(KernelId id, Schema schema_,
                              std::vector<ColumnIdx> keys_)
     : NonStreamKernel(id), schema(std::move(schema_)), keys(std::move(keys_)),
       impl(std::make_shared<detail::HashJoinImpl>()) {
-  CURA_ASSERT(!keys.empty(), "Empty build keys for HashJoinBuild");
+  ARA_ASSERT(!keys.empty(), "Empty build keys for HashJoinBuild");
 }
 
 void HashJoinBuild::push(const Context &ctx, ThreadId thread_id,
@@ -221,4 +221,4 @@ HashJoinProbe::streamImpl(const Context &ctx, ThreadId thread_id,
                     build_side);
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel

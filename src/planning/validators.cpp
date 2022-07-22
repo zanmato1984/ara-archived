@@ -1,12 +1,12 @@
 #include "validators.h"
 #include "ara/expression/expression_visitor.h"
 
-namespace cura::planning {
+namespace ara::planning {
 
-using cura::expression::ColumnRef;
-using cura::expression::Expression;
-using cura::expression::ExpressionVisitor;
-using cura::relational::Schema;
+using ara::expression::ColumnRef;
+using ara::expression::Expression;
+using ara::expression::ExpressionVisitor;
+using ara::relational::Schema;
 
 namespace detail {
 
@@ -37,9 +37,9 @@ void validateExpression(const Schema &input_schema,
   auto column_refs = ColumnRefCollector().visit(expression);
   std::for_each(column_refs.begin(), column_refs.end(),
                 [&input_schema](const auto &column_ref) {
-                  CURA_ASSERT(column_ref->columnIdx() < input_schema.size(),
+                  ARA_ASSERT(column_ref->columnIdx() < input_schema.size(),
                               "Column ref out of bound");
-                  CURA_ASSERT(column_ref->dataType() ==
+                  ARA_ASSERT(column_ref->dataType() ==
                                   input_schema[column_ref->columnIdx()],
                               "Column ref data type mismatch with column");
                 });
@@ -88,4 +88,4 @@ void ColumnRefValidator::visitSort(const std::shared_ptr<const RelSort> &sort) {
                 });
 }
 
-} // namespace cura::planning
+} // namespace ara::planning

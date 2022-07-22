@@ -2,9 +2,9 @@
 #include "ara/data/column_vector.h"
 #include "ara/data/fragment.h"
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::data::Column;
+using ara::data::Column;
 
 std::shared_ptr<const Fragment>
 InputSource::pushImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
@@ -21,7 +21,7 @@ std::shared_ptr<const Fragment> InputSource::streamImpl(
 std::shared_ptr<const Fragment>
 HeapSource::pushImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
                      std::shared_ptr<const Fragment> fragment) const {
-  CURA_ASSERT(!fragment, "fragment for " + name() + "'s pushImpl must be null");
+  ARA_ASSERT(!fragment, "fragment for " + name() + "'s pushImpl must be null");
 
   auto heap_fragment = kernel->heapFragment();
   if (pushed) {
@@ -42,7 +42,7 @@ HeapSource::pushImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
 std::shared_ptr<const Fragment> HeapSource::streamImpl(
     const Context &ctx, ThreadId thread_id, KernelId upstream,
     std::shared_ptr<const Fragment> fragment, size_t rows) const {
-  CURA_ASSERT(!fragment,
+  ARA_ASSERT(!fragment,
               "fragment for " + name() + "'s streamImpl must be null");
 
   auto heap_fragment = kernel->heapFragment();
@@ -68,4 +68,4 @@ std::shared_ptr<const Fragment> HeapSource::streamImpl(
   return std::make_shared<Fragment>(std::move(columns));
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel

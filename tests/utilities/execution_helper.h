@@ -6,10 +6,10 @@
 #include <iostream>
 #include <list>
 
-namespace cura::test::execution {
+namespace ara::test::execution {
 
-using cura::relational::Rel;
-using cura::test::database::Database;
+using ara::relational::Rel;
+using ara::test::database::Database;
 
 template <typename DbExecutor>
 void testExecute(const Database<DbExecutor> &db, const std::string &json) {
@@ -24,4 +24,4 @@ void testExecute(const Database<DbExecutor> &db,
   db.execute(rel);
 }
 
-} // namespace cura::test::execution
+} // namespace ara::test::execution

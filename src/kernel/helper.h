@@ -3,11 +3,11 @@
 #include "ara/data/fragment.h"
 #include "ara/execution/memory_resource.h"
 
-namespace cura::kernel::detail {
+namespace ara::kernel::detail {
 
-using cura::data::Fragment;
-using cura::execution::MemoryResource;
-using cura::type::Schema;
+using ara::data::Fragment;
+using ara::execution::MemoryResource;
+using ara::type::Schema;
 
 std::shared_ptr<Fragment>
 concatFragments(MemoryResource::Underlying *underlying, const Schema &schema,
@@ -40,4 +40,4 @@ struct RowEqual {
   arrow::Scalar::PtrsEqual scalar_equal;
 };
 
-} // namespace cura::kernel::detail
+} // namespace ara::kernel::detail

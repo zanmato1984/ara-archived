@@ -2,7 +2,7 @@
 
 #include "ara/expression/expressions.h"
 
-namespace cura::expression {
+namespace ara::expression {
 
 #define APPLY_FOR_UNARY_OPERATORS(ACTION)                                      \
   ACTION(SIN, sin)                                                             \
@@ -66,4 +66,4 @@ private:
   UnaryOperator unary_operator;
 };
 
-} // namespace cura::expression
+} // namespace ara::expression

@@ -6,45 +6,45 @@
 #include <optional>
 #include <unordered_map>
 
-namespace cura::driver {
+namespace ara::driver {
 struct Option;
-} // namespace cura::driver
+} // namespace ara::driver
 
-namespace cura::execution {
+namespace ara::execution {
 class Pipeline;
-} // namespace cura::execution
+} // namespace ara::execution
 
-namespace cura::kernel {
+namespace ara::kernel {
 struct HashJoinBuild;
 struct Kernel;
 struct NonStreamKernel;
 struct Source;
-} // namespace cura::kernel
+} // namespace ara::kernel
 
-namespace cura::planning {
+namespace ara::planning {
 
-using cura::driver::Option;
-using cura::execution::Pipeline;
-using cura::kernel::HashJoinBuild;
-using cura::kernel::Kernel;
-using cura::relational::Rel;
-using cura::relational::RelAggregate;
-using cura::relational::RelFilter;
-using cura::relational::RelHashJoin;
-using cura::relational::RelHashJoinBuild;
-using cura::relational::RelHashJoinProbe;
-using cura::relational::RelInputSource;
-using cura::relational::RelLimit;
-using cura::relational::RelProject;
-using cura::relational::RelSort;
-using cura::relational::RelUnion;
-using cura::relational::RelUnionAll;
-using cura::relational::RelVisitor;
+using ara::driver::Option;
+using ara::execution::Pipeline;
+using ara::kernel::HashJoinBuild;
+using ara::kernel::Kernel;
+using ara::relational::Rel;
+using ara::relational::RelAggregate;
+using ara::relational::RelFilter;
+using ara::relational::RelHashJoin;
+using ara::relational::RelHashJoinBuild;
+using ara::relational::RelHashJoinProbe;
+using ara::relational::RelInputSource;
+using ara::relational::RelLimit;
+using ara::relational::RelProject;
+using ara::relational::RelSort;
+using ara::relational::RelUnion;
+using ara::relational::RelUnionAll;
+using ara::relational::RelVisitor;
 
 namespace detail {
 
-using cura::kernel::NonStreamKernel;
-using cura::kernel::Source;
+using ara::kernel::NonStreamKernel;
+using ara::kernel::Source;
 
 struct PipelineBuilder {
   std::vector<std::shared_ptr<const Source>> sources;
@@ -144,4 +144,4 @@ private:
       pipeline_chains;
 };
 
-} // namespace cura::planning
+} // namespace ara::planning

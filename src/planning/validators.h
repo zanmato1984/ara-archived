@@ -2,14 +2,14 @@
 
 #include "ara/relational/rel_visitor.h"
 
-namespace cura::planning {
+namespace ara::planning {
 
-using cura::relational::RelAggregate;
-using cura::relational::RelFilter;
-using cura::relational::RelHashJoin;
-using cura::relational::RelProject;
-using cura::relational::RelSort;
-using cura::relational::RelVisitor;
+using ara::relational::RelAggregate;
+using ara::relational::RelFilter;
+using ara::relational::RelHashJoin;
+using ara::relational::RelProject;
+using ara::relational::RelSort;
+using ara::relational::RelVisitor;
 
 /// Validate that ColumnRef is within the bound of the children's output and of
 /// the same data type as the referred column.
@@ -27,4 +27,4 @@ struct ColumnRefValidator : public RelVisitor<ColumnRefValidator, void> {
 
 // TODO: Type check and inference.
 
-} // namespace cura::planning
+} // namespace ara::planning

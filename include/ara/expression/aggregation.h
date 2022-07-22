@@ -2,7 +2,7 @@
 
 #include "ara/expression/expressions.h"
 
-namespace cura::expression {
+namespace ara::expression {
 
 #define APPLY_FOR_AGGREGATION_OPERATORS(ACTION)                                \
   ACTION(SUM)                                                                  \
@@ -39,12 +39,12 @@ enum class AggregationOperator : int32_t {
 inline std::string aggregationOperatorToString(AggregationOperator op) {
 #define AGGREGATION_OP_CASE(OP)                                                \
   case AggregationOperator::OP:                                                \
-    return CURA_STRINGIFY(OP);
+    return ARA_STRINGIFY(OP);
 
   switch (op) {
     APPLY_FOR_AGGREGATION_OPERATORS(AGGREGATION_OP_CASE);
   default:
-    CURA_FAIL("Unknown aggregation op " +
+    ARA_FAIL("Unknown aggregation op " +
               std::to_string(static_cast<int32_t>(op)));
   }
 
@@ -53,13 +53,13 @@ inline std::string aggregationOperatorToString(AggregationOperator op) {
 
 inline AggregationOperator aggregationOperatorFromString(const std::string &s) {
 #define AGGREGATION_OP_CASE(OP)                                                \
-  if (s == CURA_STRINGIFY(OP)) {                                               \
+  if (s == ARA_STRINGIFY(OP)) {                                               \
     return AggregationOperator::OP;                                            \
   }
 
   APPLY_FOR_AGGREGATION_OPERATORS(AGGREGATION_OP_CASE)
 
-  CURA_FAIL("Invalid aggregation operator: " + s);
+  ARA_FAIL("Invalid aggregation operator: " + s);
 
 #undef UNARY_OP_CASE
 }
@@ -68,7 +68,7 @@ struct Aggregation : public Op {
   Aggregation(AggregationOperator aggregation_operator_,
               std::shared_ptr<const Expression> operand, DataType data_type)
       : Op({operand}, data_type), aggregation_operator(aggregation_operator_) {
-    CURA_ASSERT(operand, "Invalid operand for Aggregation");
+    ARA_ASSERT(operand, "Invalid operand for Aggregation");
   }
 
   const DataType &dataType() const override { return data_type; }
@@ -109,4 +109,4 @@ private:
   int64_t n_;
 };
 
-}; // namespace cura::expression
+}; // namespace ara::expression

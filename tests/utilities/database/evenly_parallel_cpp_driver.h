@@ -8,9 +8,9 @@
 #include <cmath>
 #include <future>
 
-namespace cura::test::database {
+namespace ara::test::database {
 
-using cura::driver::Driver;
+using ara::driver::Driver;
 
 // TODO: Consider generalize the parallelism and how evenly it would be so that
 // all serial/evenly-parallel/oddly-parallel could be represented using the same
@@ -50,7 +50,7 @@ struct EvenlyParallelCppDriver {
       } else {
         /// Input source.
         auto table_it = tables.find(source_id);
-        CURA_ASSERT(table_it != tables.end(),
+        ARA_ASSERT(table_it != tables.end(),
                     "Table " + std::to_string(source_id) + " not found");
         const auto &table = table_it->second;
         size_t fragments_per_thread =
@@ -106,4 +106,4 @@ struct EvenlyParallelCppDriver {
   }
 };
 
-} // namespace cura::test::database
+} // namespace ara::test::database

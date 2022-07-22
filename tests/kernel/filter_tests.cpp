@@ -7,18 +7,18 @@
 
 #include <gtest/gtest.h>
 
-using cura::VoidKernelId;
-using cura::expression::BinaryOp;
-using cura::expression::BinaryOperator;
-using cura::expression::ColumnRef;
-using cura::expression::Literal;
-using cura::kernel::Filter;
-using cura::test::data::makeDirectColumnVector;
-using cura::test::data::makeDirectColumnVectorN;
-using cura::test::data::makeFragment;
-using cura::type::DataType;
-using cura::type::Schema;
-using cura::type::TypeId;
+using ara::VoidKernelId;
+using ara::expression::BinaryOp;
+using ara::expression::BinaryOperator;
+using ara::expression::ColumnRef;
+using ara::expression::Literal;
+using ara::kernel::Filter;
+using ara::test::data::makeDirectColumnVector;
+using ara::test::data::makeDirectColumnVectorN;
+using ara::test::data::makeFragment;
+using ara::type::DataType;
+using ara::type::Schema;
+using ara::type::TypeId;
 
 TEST(FilterTest, VectorAddVectorEqLiteral) {
   Option option;
@@ -53,8 +53,8 @@ TEST(FilterTest, VectorAddVectorEqLiteral) {
         makeDirectColumnVector<int32_t>(DataType::int32Type(), {41});
     auto expected_1 =
         makeDirectColumnVector<int32_t>(DataType::int32Type(), {1});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected_0, res_cvv_0);
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected_1, res_cvv_1);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected_0, res_cvv_0);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected_1, res_cvv_1);
   }
 }
 
@@ -84,7 +84,7 @@ TEST(FilterTest, VectorNullableEqLiteral) {
     auto res_cv = res_fragment->column(0);
     auto expected = makeDirectColumnVector<int32_t>(DataType::int32Type(true),
                                                     {42}, {true});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, res_cv);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, res_cv);
   }
 }
 
@@ -114,6 +114,6 @@ TEST(FilterTest, LiteralEqVectorNullable) {
     auto res_cv = res_fragment->column(0);
     auto expected =
         makeDirectColumnVector<int32_t>(DataType::int32Type(), {42});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, res_cv);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, res_cv);
   }
 }

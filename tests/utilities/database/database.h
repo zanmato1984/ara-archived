@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace cura::test::database {
+namespace ara::test::database {
 
 template <typename DbExecutor> class Database {
 public:
@@ -27,4 +27,4 @@ private:
   std::unordered_map<TableId, Table> tables;
 };
 
-} // namespace cura::test::database
+} // namespace ara::test::database

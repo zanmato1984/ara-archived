@@ -8,9 +8,9 @@
 #include <iostream>
 #include <string>
 
-using cura::isHeapSourceId;
-using cura::data::Fragment;
-using cura::driver::Driver;
+using ara::isHeapSourceId;
+using ara::data::Fragment;
+using ara::driver::Driver;
 using ArrowArray = struct ArrowArray;
 using ArrowSchema = struct ArrowSchema;
 
@@ -24,7 +24,7 @@ std::shared_ptr<Fragment> importArrowFragment(ArrowArray *input,
     return nullptr;
   }
 
-  auto rb = CURA_GET_ARROW_RESULT(arrow::ImportRecordBatch(input, schema));
+  auto rb = ARA_GET_ARROW_RESULT(arrow::ImportRecordBatch(input, schema));
   return std::make_shared<Fragment>(rb);
 }
 
@@ -35,7 +35,7 @@ size_t exportArrowFragment(std::shared_ptr<const Fragment> fragment,
   }
 
   auto rb = fragment->arrow();
-  CURA_ASSERT_ARROW_OK(arrow::ExportRecordBatch(*rb, out, schema),
+  ARA_ASSERT_ARROW_OK(arrow::ExportRecordBatch(*rb, out, schema),
                        "Export record batch failed");
   return 1;
 }

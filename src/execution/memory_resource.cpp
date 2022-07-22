@@ -6,7 +6,7 @@
 
 #include <arrow/memory_pool.h>
 
-namespace cura::execution {
+namespace ara::execution {
 
 namespace detail {
 
@@ -60,7 +60,7 @@ struct LightWeightPerThreadMemoryResource : public MemoryResource {
   }
 
   Underlying *preConcatenate(ThreadId thread_id) const override {
-    CURA_ASSERT(thread_id < thread_ls.size(),
+    ARA_ASSERT(thread_id < thread_ls.size(),
                 "LightWeightPerThreadMemoryResource invalid thread ID " +
                     std::to_string(thread_id) + " (" +
                     std::to_string(thread_ls.size()) + " threads in total)");
@@ -145,9 +145,9 @@ std::unique_ptr<MemoryResource> createMemoryResource(const Option &option) {
   case MemoryResource::Mode::CUDA:
     return std::make_unique<detail::CudaMemoryResource>(option);
   default:
-    CURA_FAIL("Unsupported memory resource type: " +
+    ARA_FAIL("Unsupported memory resource type: " +
               std::to_string(option.memory_resource));
   }
 }
 
-} // namespace cura::execution
+} // namespace ara::execution

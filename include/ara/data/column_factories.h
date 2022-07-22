@@ -4,9 +4,9 @@
 
 #include <arrow/api.h>
 
-namespace cura::data {
+namespace ara::data {
 
-using cura::type::DataType;
+using ara::type::DataType;
 
 class ColumnScalar;
 class ColumnVector;
@@ -19,4 +19,4 @@ std::unique_ptr<ColumnVector>
 createArrowColumnVector(const DataType &data_type,
                         std::shared_ptr<arrow::Array> array);
 
-} // namespace cura::data
+} // namespace ara::data

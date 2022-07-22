@@ -5,9 +5,9 @@
 #include <arrow/api.h>
 #include <arrow/visitor.h>
 
-namespace cura::expression {
+namespace ara::expression {
 
-using cura::type::TypeId;
+using ara::type::TypeId;
 
 namespace detail {
 
@@ -15,7 +15,7 @@ template <typename T, std::enable_if_t<!std::is_constructible<
                           std::decay_t<T>, std::string>::value> * = nullptr>
 inline std::shared_ptr<arrow::Scalar>
 createScalar(std::shared_ptr<arrow::DataType> data_type, T &&value) {
-  return CURA_GET_ARROW_RESULT(
+  return ARA_GET_ARROW_RESULT(
       arrow::MakeScalar(data_type, std::forward<T>(value)));
 }
 
@@ -106,8 +106,8 @@ struct Literal : public Expression {
   template <typename T>
   explicit Literal(TypeId type_id, T &&value) : data_type(type_id, false) {
     scalar = detail::createScalar(data_type.arrow(), std::forward<T>(value));
-    CURA_ASSERT(data_type.arrow()->Equals(scalar->type),
-                "Mismatched cura and arrow data types " + data_type.toString() +
+    ARA_ASSERT(data_type.arrow()->Equals(scalar->type),
+                "Mismatched ara and arrow data types " + data_type.toString() +
                     " vs " + DataType(scalar->type, false).toString());
   }
 
@@ -123,7 +123,7 @@ struct Literal : public Expression {
 
   template <typename T> T value() const {
     detail::GetValueScalarVisitor<T> visitor;
-    CURA_ASSERT_ARROW_OK(arrow::VisitScalarInline(*scalar, &visitor),
+    ARA_ASSERT_ARROW_OK(arrow::VisitScalarInline(*scalar, &visitor),
                          "Get arrow value from literal failed")
     return visitor.value;
   }
@@ -135,4 +135,4 @@ private:
   std::shared_ptr<arrow::Scalar> scalar;
 };
 
-} // namespace cura::expression
+} // namespace ara::expression

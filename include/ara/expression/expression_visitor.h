@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace cura::expression {
+namespace ara::expression {
 
 template <typename Impl, typename Result> struct ExpressionVisitor {
   Result visit(const std::shared_ptr<const Expression> &expression) {
@@ -28,7 +28,7 @@ template <typename Impl, typename Result> struct ExpressionVisitor {
       return impl().visitOp(op, operands);
     }
 
-    CURA_FAIL("Unknown Expression type.");
+    ARA_FAIL("Unknown Expression type.");
   }
 
   Result visitLiteral(const std::shared_ptr<const Literal> &literal) {
@@ -81,7 +81,7 @@ template <typename Impl> struct ExpressionVisitor<Impl, void> {
       return;
     }
 
-    CURA_FAIL("Unknown Expression type.");
+    ARA_FAIL("Unknown Expression type.");
   }
 
   void visitLiteral(const std::shared_ptr<const Literal> &literal) {
@@ -105,4 +105,4 @@ private:
   const Impl &impl() const { return *static_cast<const Impl *>(this); }
 };
 
-} // namespace cura::expression
+} // namespace ara::expression

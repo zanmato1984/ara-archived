@@ -5,12 +5,12 @@
 
 #include <mutex>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::expression::AggregationOperator;
-using cura::expression::ColumnIdx;
-using cura::type::DataType;
-using cura::type::Schema;
+using ara::expression::AggregationOperator;
+using ara::expression::ColumnIdx;
+using ara::type::DataType;
+using ara::type::Schema;
 
 struct PhysicalAggregation {
   ColumnIdx idx;
@@ -54,4 +54,4 @@ private:
   mutable std::shared_ptr<const Fragment> converged_fragment;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

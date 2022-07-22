@@ -4,13 +4,13 @@
 
 #include <list>
 
-namespace cura::driver {
+namespace ara::driver {
 struct Option;
-} // namespace cura::driver
+} // namespace ara::driver
 
-namespace cura::execution {
+namespace ara::execution {
 
-using cura::driver::Option;
+using ara::driver::Option;
 
 struct Executor {
 public:
@@ -41,4 +41,4 @@ private:
   std::list<std::unique_ptr<Pipeline>> pipelines;
 };
 
-} // namespace cura::execution
+} // namespace ara::execution

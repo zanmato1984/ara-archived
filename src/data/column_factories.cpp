@@ -2,7 +2,7 @@
 #include "ara/data/column_scalar.h"
 #include "ara/data/column_vector.h"
 
-namespace cura::data {
+namespace ara::data {
 
 std::unique_ptr<ColumnScalar>
 createArrowColumnScalar(const DataType &data_type, size_t size,
@@ -16,4 +16,4 @@ createArrowColumnVector(const DataType &data_type,
   return std::make_unique<ColumnVectorArrow>(data_type, array);
 }
 
-} // namespace cura::data
+} // namespace ara::data

@@ -5,18 +5,18 @@
 
 #include <gtest/gtest.h>
 
-using cura::VoidKernelId;
-using cura::VoidThreadId;
-using cura::expression::ColumnIdx;
-using cura::kernel::HashJoinBuild;
-using cura::kernel::HashJoinProbe;
-using cura::relational::BuildSide;
-using cura::relational::JoinType;
-using cura::test::data::makeDirectColumnVector;
-using cura::test::data::makeDirectColumnVectorN;
-using cura::test::data::makeFragment;
-using cura::type::DataType;
-using cura::type::Schema;
+using ara::VoidKernelId;
+using ara::VoidThreadId;
+using ara::expression::ColumnIdx;
+using ara::kernel::HashJoinBuild;
+using ara::kernel::HashJoinProbe;
+using ara::relational::BuildSide;
+using ara::relational::JoinType;
+using ara::test::data::makeDirectColumnVector;
+using ara::test::data::makeDirectColumnVectorN;
+using ara::test::data::makeFragment;
+using ara::type::DataType;
+using ara::type::Schema;
 
 TEST(JoinTest, LeftJoin) {
   Option option;
@@ -54,6 +54,6 @@ TEST(JoinTest, LeftJoin) {
       makeDirectColumnVector<int32_t>(DataType::int32Type(), {22, 32, 42, 52});
   auto expected_1 = makeDirectColumnVector<int32_t>(
       DataType::int32Type(true), {0, 0, 42, 0}, {false, false, true, false});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected_0, res_cv_0);
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected_1, res_cv_1);
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected_0, res_cv_0);
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected_1, res_cv_1);
 }

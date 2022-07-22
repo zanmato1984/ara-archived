@@ -5,15 +5,15 @@
 
 #include <gtest/gtest.h>
 
-using cura::VoidKernelId;
-using cura::VoidThreadId;
-using cura::kernel::HeapSource;
-using cura::kernel::Union;
-using cura::test::data::assertColumnsEqual;
-using cura::test::data::makeDirectColumnVector;
-using cura::test::data::makeFragment;
-using cura::type::DataType;
-using cura::type::Schema;
+using ara::VoidKernelId;
+using ara::VoidThreadId;
+using ara::kernel::HeapSource;
+using ara::kernel::Union;
+using ara::test::data::assertColumnsEqual;
+using ara::test::data::makeDirectColumnVector;
+using ara::test::data::makeFragment;
+using ara::type::DataType;
+using ara::type::Schema;
 
 TEST(UnionTest, Union) {
   Option option;
@@ -46,6 +46,6 @@ TEST(UnionTest, Union) {
   auto expected1 = makeDirectColumnVector<std::string>(
       DataType::stringType(true), {"ab", "", "cd", ""},
       {true, false, true, false});
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
-  CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected0, res->column(0));
+  ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(expected1, res->column(1));
 }

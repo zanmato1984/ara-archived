@@ -3,11 +3,11 @@
 #include "ara/expression/expressions.h"
 #include "ara/kernel/kernel.h"
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::type::Schema;
+using ara::type::Schema;
 
-using cura::expression::Expression;
+using ara::expression::Expression;
 
 struct Filter : NonSourceStreamKernel {
   Filter(KernelId id, Schema schema_,
@@ -31,4 +31,4 @@ private:
   std::shared_ptr<const Expression> condition;
 };
 
-} // namespace cura::kernel
+} // namespace ara::kernel

@@ -8,13 +8,13 @@
 #include <cmath>
 #include <future>
 
-namespace cura::test::database {
+namespace ara::test::database {
 
-#define CURA_ASSERT_C(cond)                                                    \
+#define ARA_ASSERT_C(cond)                                                    \
   {                                                                            \
     auto error = (cond);                                                       \
-    CURA_ASSERT(!error,                                                        \
-                "CURA C API call failed with error " + std::to_string(error)); \
+    ARA_ASSERT(!error,                                                        \
+                "ARA C API call failed with error " + std::to_string(error)); \
   }
 
 // TODO: Consider generalize the parallelism and how evenly it would be so that
@@ -42,11 +42,11 @@ struct EvenlyParallelCDriver {
                   auto res = pipeline_stream(driver, thread, source_id, nullptr,
                                              nullptr, &output, &schema,
                                              rows_per_heap_thread);
-                  CURA_ASSERT(res >= 0, "Pipeline stream failed with error " +
+                  ARA_ASSERT(res >= 0, "Pipeline stream failed with error " +
                                             std::to_string(res));
 
                   while (res > 0) {
-                    auto rb = CURA_GET_ARROW_RESULT(
+                    auto rb = ARA_GET_ARROW_RESULT(
                         arrow::ImportRecordBatch(&output, &schema));
                     auto result = std::make_shared<Fragment>(rb);
                     Sink::sink(*result);
@@ -60,7 +60,7 @@ struct EvenlyParallelCDriver {
                     res = pipeline_stream(driver, thread, source_id, nullptr,
                                           nullptr, &output, &schema,
                                           rows_per_heap_thread);
-                    CURA_ASSERT(res >= 0, "Pipeline stream failed with error " +
+                    ARA_ASSERT(res >= 0, "Pipeline stream failed with error " +
                                               std::to_string(res));
                   }
                 }));
@@ -75,7 +75,7 @@ struct EvenlyParallelCDriver {
       } else {
         /// Input source.
         auto table_it = tables.find(source_id);
-        CURA_ASSERT(table_it != tables.end(),
+        ARA_ASSERT(table_it != tables.end(),
                     "Table " + std::to_string(source_id) + " not found");
         const auto &table = table_it->second;
         size_t fragments_per_thread =
@@ -91,7 +91,7 @@ struct EvenlyParallelCDriver {
                     auto input_rb = fragment->arrow();
                     ArrowArray input{};
                     ArrowSchema input_schema{};
-                    CURA_ASSERT_ARROW_OK(arrow::ExportRecordBatch(
+                    ARA_ASSERT_ARROW_OK(arrow::ExportRecordBatch(
                                              *input_rb, &input, &input_schema),
                                          "Export record batch failed");
 
@@ -102,11 +102,11 @@ struct EvenlyParallelCDriver {
                       auto res = pipeline_stream(driver, thread, source_id,
                                                  &input, &input_schema, &output,
                                                  &output_schema, 0);
-                      CURA_ASSERT(res >= 0,
+                      ARA_ASSERT(res >= 0,
                                   "Pipeline stream failed with error " +
                                       std::to_string(res));
                       if (res > 0) {
-                        auto output_rb = CURA_GET_ARROW_RESULT(
+                        auto output_rb = ARA_GET_ARROW_RESULT(
                             arrow::ImportRecordBatch(&output, &output_schema));
                         auto result = std::make_shared<Fragment>(output_rb);
                         Sink::sink(*result);
@@ -119,7 +119,7 @@ struct EvenlyParallelCDriver {
                       }
                     } else {
                       /// Push the input fragment into pipeline.
-                      CURA_ASSERT_C(pipeline_push(driver, thread, source_id,
+                      ARA_ASSERT_C(pipeline_push(driver, thread, source_id,
                                                   &input, &input_schema));
                     }
                   }
@@ -135,11 +135,11 @@ struct EvenlyParallelCDriver {
 
   static void explain(const std::string &json, bool extended) {
     auto driver = create_driver();
-    CURA_ASSERT(driver, "Create driver failed");
+    ARA_ASSERT(driver, "Create driver failed");
 
     char **explained;
     int n = ::explain(driver, json.data(), extended, &explained);
-    CURA_ASSERT(n >= 0, "Explain failed with " + std::to_string(n));
+    ARA_ASSERT(n >= 0, "Explain failed with " + std::to_string(n));
     for (int i = 0; i < n; i++) {
       std::cout << explained[i] << std::endl;
       free(explained[i]);
@@ -150,22 +150,22 @@ struct EvenlyParallelCDriver {
   static void execute(const std::unordered_map<TableId, Table> &tables,
                       const std::string &json) {
     auto driver = create_driver();
-    CURA_ASSERT(driver, "Create driver failed");
+    ARA_ASSERT(driver, "Create driver failed");
 
-    CURA_ASSERT_C(compile(driver, json.data()));
+    ARA_ASSERT_C(compile(driver, json.data()));
 
-    CURA_ASSERT_C(set_threads_per_pipeline(driver, parallelism));
+    ARA_ASSERT_C(set_threads_per_pipeline(driver, parallelism));
 
     while (has_next_pipeline(driver)) {
-      CURA_ASSERT_C(prepare_pipeline(driver));
+      ARA_ASSERT_C(prepare_pipeline(driver));
       executePipeline(driver, tables);
-      CURA_ASSERT_C(finish_pipeline(driver));
+      ARA_ASSERT_C(finish_pipeline(driver));
     }
 
     release_driver(driver);
   }
 };
 
-#undef CURA_ASSERT_C
+#undef ARA_ASSERT_C
 
-} // namespace cura::test::database
+} // namespace ara::test::database

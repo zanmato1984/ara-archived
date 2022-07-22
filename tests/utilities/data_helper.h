@@ -12,18 +12,18 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-namespace cura::test::data {
+namespace ara::test::data {
 
-using cura::data::Column;
-using cura::data::ColumnScalar;
-using cura::data::ColumnVector;
-using cura::data::createArrowColumnScalar;
-using cura::data::createArrowColumnVector;
-using cura::data::Fragment;
-using cura::expression::Literal;
-using cura::test::database::Table;
-using cura::test::database::TableId;
-using cura::type::DataType;
+using ara::data::Column;
+using ara::data::ColumnScalar;
+using ara::data::ColumnVector;
+using ara::data::createArrowColumnScalar;
+using ara::data::createArrowColumnVector;
+using ara::data::Fragment;
+using ara::expression::Literal;
+using ara::test::database::Table;
+using ara::test::database::TableId;
+using ara::type::DataType;
 
 namespace detail {
 
@@ -40,23 +40,23 @@ struct BaseTypeVisitor : public arrow::TypeVisitor {
   arrow::Status visit(const ArrowType &type) {
     auto pool = arrow::default_memory_pool();
     std::unique_ptr<arrow::ArrayBuilder> builder;
-    CURA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, data_type.arrow(), &builder),
+    ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, data_type.arrow(), &builder),
                          "Creating arrow column builder failed");
     auto type_builder = dynamic_cast<BuilderType *>(builder.get());
-    CURA_ASSERT(type_builder, "Cast to concrete builder failed");
+    ARA_ASSERT(type_builder, "Cast to concrete builder failed");
     size_t i_valid_mask = 0;
     for (const auto &v : container) {
       if (!data_type.nullable || valid_mask[i_valid_mask]) {
-        CURA_ASSERT_ARROW_OK(type_builder->Append(v),
+        ARA_ASSERT_ARROW_OK(type_builder->Append(v),
                              "Append to arrow array failed");
       } else {
-        CURA_ASSERT_ARROW_OK(type_builder->AppendNull(),
+        ARA_ASSERT_ARROW_OK(type_builder->AppendNull(),
                              "Append null to arrow array failed");
       }
       i_valid_mask++;
     }
     std::shared_ptr<arrow::Array> array;
-    CURA_ASSERT_ARROW_OK(type_builder->Finish(&array),
+    ARA_ASSERT_ARROW_OK(type_builder->Finish(&array),
                          "Finish arrow build failed");
 
     cv = createArrowColumnVector(data_type, array);
@@ -120,7 +120,7 @@ inline std::unique_ptr<ColumnVector>
 makeArrowColumnVector(const DataType &data_type, Container<T> &&data,
                       std::vector<bool> valid_mask) {
   if (data_type.nullable) {
-    CURA_ASSERT(data.size() == valid_mask.size(),
+    ARA_ASSERT(data.size() == valid_mask.size(),
                 "Mismatched sizes between data and valid mask");
   }
 
@@ -136,11 +136,11 @@ makeArrowColumnVector(const DataType &data_type, Container<T> &&data,
   switch (data_type.arrow()->id()) {
     ARROW_GENERATE_FOR_ALL_TYPES(MAKE_TYPE_VISITOR)
   default:
-    CURA_FAIL("Unsupported");
+    ARA_FAIL("Unsupported");
   }
 #undef MAKE_TYPE_VISITOR
 
-  CURA_ASSERT_ARROW_OK(data_type.arrow()->Accept(visitor.get()),
+  ARA_ASSERT_ARROW_OK(data_type.arrow()->Accept(visitor.get()),
                        "Create arrow array failed");
   return std::move(visitor->cv);
 }
@@ -189,10 +189,10 @@ inline std::shared_ptr<const Fragment> makeFragment(ColumnVectors &&... cvs) {
 void assertColumnsEqual(const ColumnVector &lhs, const ColumnVector &rhs,
                         bool sort = false);
 
-#define CURA_TEST_EXPECT_COLUMNS_EQUAL(lhs, rhs...)                            \
-  cura::test::data::assertColumnsEqual(*lhs, *rhs)
+#define ARA_TEST_EXPECT_COLUMNS_EQUAL(lhs, rhs...)                            \
+  ara::test::data::assertColumnsEqual(*lhs, *rhs)
 
-#define CURA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(lhs, rhs...)                    \
-  cura::test::data::assertColumnsEqual(*lhs, *rhs, true)
+#define ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(lhs, rhs...)                    \
+  ara::test::data::assertColumnsEqual(*lhs, *rhs, true)
 
-} // namespace cura::test::data
+} // namespace ara::test::data

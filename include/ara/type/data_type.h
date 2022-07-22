@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace cura::type {
+namespace ara::type {
 
 #define APPLY_FOR_TYPE_IDS(ACTION)                                             \
   ACTION(EMPTY)                                                                \
@@ -49,12 +49,12 @@ enum class TypeId : int32_t { APPLY_FOR_TYPE_IDS(DEF_TYPE_ID_ENUM) };
 inline std::string typeIdToString(TypeId type_id) {
 #define TYPE_ID_CASE(TYPE)                                                     \
   case TypeId::TYPE:                                                           \
-    return CURA_STRINGIFY(TYPE);
+    return ARA_STRINGIFY(TYPE);
 
   switch (type_id) {
     APPLY_FOR_TYPE_IDS(TYPE_ID_CASE);
   default:
-    CURA_FAIL("Unknown type id " +
+    ARA_FAIL("Unknown type id " +
               std::to_string(static_cast<int32_t>(type_id)));
   }
 
@@ -63,13 +63,13 @@ inline std::string typeIdToString(TypeId type_id) {
 
 inline TypeId typeIdFromString(const std::string &s) {
 #define TYPE_ID_CASE(TYPE)                                                     \
-  if (s == CURA_STRINGIFY(TYPE)) {                                             \
+  if (s == ARA_STRINGIFY(TYPE)) {                                             \
     return TypeId::TYPE;                                                       \
   }
 
   APPLY_FOR_TYPE_IDS(TYPE_ID_CASE)
 
-  CURA_FAIL("Invalid type id: " + s);
+  ARA_FAIL("Invalid type id: " + s);
 
 #undef TYPE_ID_CASE
 }
@@ -178,4 +178,4 @@ struct DataType {
 
 using Schema = std::vector<DataType>;
 
-} // namespace cura::type
+} // namespace ara::type

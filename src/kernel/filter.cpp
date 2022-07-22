@@ -6,11 +6,11 @@
 #include <arrow/compute/api.h>
 #include <arrow/visitor.h>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::data::ColumnScalar;
-using cura::data::ColumnVector;
-using cura::type::TypeId;
+using ara::data::ColumnScalar;
+using ara::data::ColumnVector;
+using ara::type::TypeId;
 
 namespace detail {
 
@@ -37,13 +37,13 @@ std::shared_ptr<const Fragment>
 Filter::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
                    std::shared_ptr<const Fragment> fragment) const {
   auto mask = condition->evaluate(ctx, thread_id, *fragment);
-  CURA_ASSERT(mask->dataType().type_id == TypeId::BOOL8,
+  ARA_ASSERT(mask->dataType().type_id == TypeId::BOOL8,
               "Mask must be bool type");
 
   if (auto mask_cs = std::dynamic_pointer_cast<const ColumnScalar>(mask);
       mask_cs) {
     detail::ScalarVisitor visitor;
-    CURA_ASSERT_ARROW_OK(arrow::VisitScalarInline(*mask_cs->arrow(), &visitor),
+    ARA_ASSERT_ARROW_OK(arrow::VisitScalarInline(*mask_cs->arrow(), &visitor),
                          "Get arrow scalar value failed");
     return visitor.value ? fragment : nullptr;
   }
@@ -51,10 +51,10 @@ Filter::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
   auto mask_cv = std::dynamic_pointer_cast<const ColumnVector>(mask);
   arrow::compute::ExecContext context(
       ctx.memory_resource->preConcatenate(thread_id));
-  const auto &filtered = CURA_GET_ARROW_RESULT(arrow::compute::Filter(
+  const auto &filtered = ARA_GET_ARROW_RESULT(arrow::compute::Filter(
       fragment->arrow(), mask_cv->arrow(),
       arrow::compute::FilterOptions::Defaults(), &context));
-  CURA_ASSERT(filtered.kind() == arrow::Datum::RECORD_BATCH,
+  ARA_ASSERT(filtered.kind() == arrow::Datum::RECORD_BATCH,
               "Filter result must be an arrow record batch");
   if (filtered.record_batch()->num_rows() == 0) {
     return nullptr;
@@ -62,4 +62,4 @@ Filter::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
   return std::make_shared<Fragment>(filtered.record_batch());
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel

@@ -2,10 +2,10 @@
 
 #include "ara/relational/rel_visitor.h"
 
-namespace cura::planning {
+namespace ara::planning {
 
-using cura::relational::Rel;
-using cura::relational::RelVisitor;
+using ara::relational::Rel;
+using ara::relational::RelVisitor;
 
 struct Explainer : public RelVisitor<Explainer, std::vector<std::string>> {
   std::vector<std::string>
@@ -13,4 +13,4 @@ struct Explainer : public RelVisitor<Explainer, std::vector<std::string>> {
                const std::vector<std::vector<std::string>> &children);
 };
 
-} // namespace cura::planning
+} // namespace ara::planning

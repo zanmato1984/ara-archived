@@ -6,17 +6,17 @@
 
 #include <gtest/gtest.h>
 
-using cura::VoidKernelId;
-using cura::expression::BinaryOp;
-using cura::expression::BinaryOperator;
-using cura::expression::ColumnRef;
-using cura::expression::Expression;
-using cura::kernel::Project;
-using cura::test::data::makeDirectColumnVector;
-using cura::test::data::makeDirectColumnVectorN;
-using cura::test::data::makeFragment;
-using cura::type::DataType;
-using cura::type::TypeId;
+using ara::VoidKernelId;
+using ara::expression::BinaryOp;
+using ara::expression::BinaryOperator;
+using ara::expression::ColumnRef;
+using ara::expression::Expression;
+using ara::kernel::Project;
+using ara::test::data::makeDirectColumnVector;
+using ara::test::data::makeDirectColumnVectorN;
+using ara::test::data::makeFragment;
+using ara::type::DataType;
+using ara::type::TypeId;
 
 TEST(ProjectTest, ColumnRef) {
   Option option;
@@ -41,7 +41,7 @@ TEST(ProjectTest, ColumnRef) {
     auto res_cvv = res_fragment->column(0);
     auto expected = makeDirectColumnVector<int32_t>(DataType::int32Type(true),
                                                     {0, 42}, {false, true});
-    CURA_TEST_EXPECT_COLUMNS_EQUAL(expected, res_cvv);
+    ARA_TEST_EXPECT_COLUMNS_EQUAL(expected, res_cvv);
   }
   {
     auto cv_0 =
@@ -49,6 +49,6 @@ TEST(ProjectTest, ColumnRef) {
     auto fragment = makeFragment(std::move(cv_0));
 
     ASSERT_THROW(project->stream(ctx, 0, VoidKernelId, fragment, 0),
-                 cura::LogicalError);
+                 ara::LogicalError);
   }
 }

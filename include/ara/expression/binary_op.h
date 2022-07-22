@@ -2,7 +2,7 @@
 
 #include "ara/expression/expressions.h"
 
-namespace cura::expression {
+namespace ara::expression {
 
 #define APPLY_FOR_BINARY_OPERATORS(ACTION)                                     \
   ACTION(ADD, +)                                                               \
@@ -48,12 +48,12 @@ enum class BinaryOperator : int32_t {
 inline std::string binaryOperatorToString(BinaryOperator op) {
 #define BINARY_OP_CASE(OP, PRETTY)                                             \
   case BinaryOperator::OP:                                                     \
-    return CURA_STRINGIFY(OP);
+    return ARA_STRINGIFY(OP);
 
   switch (op) {
     APPLY_FOR_BINARY_OPERATORS(BINARY_OP_CASE);
   default:
-    CURA_FAIL("Unknown binary op " + std::to_string(static_cast<int32_t>(op)));
+    ARA_FAIL("Unknown binary op " + std::to_string(static_cast<int32_t>(op)));
   }
 
 #undef BINARY_OP_CASE
@@ -62,12 +62,12 @@ inline std::string binaryOperatorToString(BinaryOperator op) {
 inline std::string binaryOperatorPretty(BinaryOperator op) {
 #define BINARY_OP_CASE(OP, PRETTY)                                             \
   case BinaryOperator::OP:                                                     \
-    return CURA_STRINGIFY(PRETTY);
+    return ARA_STRINGIFY(PRETTY);
 
   switch (op) {
     APPLY_FOR_BINARY_OPERATORS(BINARY_OP_CASE);
   default:
-    CURA_FAIL("Unknown binary op " + std::to_string(static_cast<int32_t>(op)));
+    ARA_FAIL("Unknown binary op " + std::to_string(static_cast<int32_t>(op)));
   }
 
 #undef BINARY_OP_CASE
@@ -75,13 +75,13 @@ inline std::string binaryOperatorPretty(BinaryOperator op) {
 
 inline BinaryOperator binaryOperatorFromString(const std::string &s) {
 #define BINARY_OP_CASE(OP, PRETTY)                                             \
-  if (s == CURA_STRINGIFY(OP)) {                                               \
+  if (s == ARA_STRINGIFY(OP)) {                                               \
     return BinaryOperator::OP;                                                 \
   }
 
   APPLY_FOR_BINARY_OPERATORS(BINARY_OP_CASE)
 
-  CURA_FAIL("Invalid binary operator: " + s);
+  ARA_FAIL("Invalid binary operator: " + s);
 
 #undef BINARY_OP_CASE
 }
@@ -91,8 +91,8 @@ struct BinaryOp : public Op {
            std::shared_ptr<const Expression> left,
            std::shared_ptr<const Expression> right, DataType data_type)
       : Op({left, right}, data_type), binary_operator(binary_operator_) {
-    CURA_ASSERT(left, "Invalid left operand for BinaryOp");
-    CURA_ASSERT(right, "Invalid right operand for BinaryOp");
+    ARA_ASSERT(left, "Invalid left operand for BinaryOp");
+    ARA_ASSERT(right, "Invalid right operand for BinaryOp");
   }
 
   const DataType &dataType() const override { return data_type; }
@@ -123,4 +123,4 @@ private:
   BinaryOperator binary_operator;
 };
 
-} // namespace cura::expression
+} // namespace ara::expression

@@ -8,9 +8,9 @@
 
 #include <sstream>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::expression::aggregationOperatorToString;
+using ara::expression::aggregationOperatorToString;
 
 BucketAggregate::BucketAggregate(KernelId id, Schema input_schema_,
                                  Schema output_schema_,
@@ -21,7 +21,7 @@ BucketAggregate::BucketAggregate(KernelId id, Schema input_schema_,
       output_schema(std::move(output_schema_)), keys(std::move(keys_)),
       aggregations(std::move(aggregations_)), buckets(buckets_)
 {
-  CURA_ASSERT(!aggregations.empty(), "Empty aggregations for BucketAggregate");
+  ARA_ASSERT(!aggregations.empty(), "Empty aggregations for BucketAggregate");
 }
 
 void BucketAggregate::push(const Context &ctx, ThreadId thread_id,
@@ -68,4 +68,4 @@ std::string BucketAggregate::toString() const {
   return Kernel::toString() + "(" + ss.str() + ")";
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel

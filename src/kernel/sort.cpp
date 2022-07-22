@@ -7,9 +7,9 @@
 #include <arrow/visitor.h>
 #include <map>
 
-namespace cura::kernel {
+namespace ara::kernel {
 
-using cura::relational::SortInfo;
+using ara::relational::SortInfo;
 
 void Sort::push(const Context &ctx, ThreadId thread_id, KernelId upstream,
                 std::shared_ptr<const Fragment> fragment) const {
@@ -75,7 +75,7 @@ struct SortTypeVisitor : public arrow::TypeVisitor {
                             !arrow::is_primitive_ctype<T>::value &&
                             !std::is_same_v<T, arrow::StringType>> * = nullptr>
   arrow::Status Visit(const T &type) {
-    CURA_FAIL("Unsupported arrow scalar");
+    ARA_FAIL("Unsupported arrow scalar");
   }
 
   bool desc;
@@ -86,11 +86,11 @@ struct SortTypeVisitor : public arrow::TypeVisitor {
 
 struct RowCompare {
   bool operator()(const Key &l, const Key &r) const {
-    CURA_ASSERT(l.size() == r.size(), "Mismatched type");
+    ARA_ASSERT(l.size() == r.size(), "Mismatched type");
     for (size_t i = 0; i < l.size(); i++) {
-      CURA_ASSERT(l[i]->type->Equals(r[i]->type), "Mismatched type");
+      ARA_ASSERT(l[i]->type->Equals(r[i]->type), "Mismatched type");
       SortTypeVisitor visitor(desc[i], null_last[i], l[i], r[i]);
-      CURA_ASSERT_ARROW_OK(arrow::VisitTypeInline(*l[i]->type, &visitor),
+      ARA_ASSERT_ARROW_OK(arrow::VisitTypeInline(*l[i]->type, &visitor),
                            "Compare row failed");
       if (visitor.result < 0) {
         return true;
@@ -130,7 +130,7 @@ doSort(const Context &ctx, const Schema &schema,
     std::transform(
         sort_infos.begin(), sort_infos.end(), key.begin(),
         [&](const auto &sort_info) {
-          return CURA_GET_ARROW_RESULT(
+          return ARA_GET_ARROW_RESULT(
               fragment->column(sort_info.idx)->arrow()->GetScalar(row));
         });
     map.emplace(std::move(key), row);
@@ -142,19 +142,19 @@ doSort(const Context &ctx, const Schema &schema,
   arrow::compute::ExecContext context(pool);
   {
     std::unique_ptr<arrow::ArrayBuilder> builder;
-    CURA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, arrow::uint64(), &builder),
+    ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, arrow::uint64(), &builder),
                          "Create indices builder failed");
     auto indices_builder = dynamic_cast<arrow::UInt64Builder *>(builder.get());
-    CURA_ASSERT(indices_builder, "Dynamic cast of indices builder failed");
+    ARA_ASSERT(indices_builder, "Dynamic cast of indices builder failed");
 
     for (const auto &entry : map) {
-      CURA_ASSERT_ARROW_OK(indices_builder->Append(entry.second),
+      ARA_ASSERT_ARROW_OK(indices_builder->Append(entry.second),
                            "Append indices failed");
     }
 
-    CURA_ASSERT_ARROW_OK(builder->Finish(&indices), "Finish indices failed");
+    ARA_ASSERT_ARROW_OK(builder->Finish(&indices), "Finish indices failed");
   }
-  const auto &datum = CURA_GET_ARROW_RESULT(
+  const auto &datum = ARA_GET_ARROW_RESULT(
       arrow::compute::Take(fragment->arrow(), indices,
                            arrow::compute::TakeOptions::Defaults(), &context));
 
@@ -183,4 +183,4 @@ void Sort::converge(const Context &ctx) const {
   converged_fragment = detail::doSort(ctx, schema, sort_infos, concatenated);
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel

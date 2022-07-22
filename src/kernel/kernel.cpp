@@ -1,12 +1,12 @@
 #include "ara/kernel/kernel.h"
 #include "ara/data/fragment.h"
 
-namespace cura::kernel {
+namespace ara::kernel {
 
 void StreamKernel::push(const Context &ctx, ThreadId thread_id,
                         KernelId upstream,
                         std::shared_ptr<const Fragment> fragment) const {
-  CURA_ASSERT(downstream, "push is not allowed for " + name() +
+  ARA_ASSERT(downstream, "push is not allowed for " + name() +
                               " kernel without a downstream");
   auto result = pushImpl(ctx, thread_id, upstream, fragment);
   if (result) {
@@ -37,4 +37,4 @@ std::shared_ptr<const Fragment> NonSourceStreamKernel::streamImpl(
   return streamImpl(ctx, thread_id, upstream, fragment);
 }
 
-} // namespace cura::kernel
+} // namespace ara::kernel
