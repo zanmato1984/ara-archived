@@ -28,11 +28,7 @@ std::vector<std::string> Planner::explain(const std::shared_ptr<const Rel> &rel,
   ColumnRefValidator().visit(rel);
 
   /// Header.
-#ifdef USE_CUDF
-  auto result = std::vector<std::string>{"CURA GPU Plan"};
-#else
   auto result = std::vector<std::string>{"CURA CPU Plan"};
-#endif
 
   /// Logical explain of the given Rel.
   {

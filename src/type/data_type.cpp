@@ -7,36 +7,6 @@ namespace cura::type {
 
 namespace detail {
 
-#ifdef USE_CUDF
-constexpr TypeId fromCudfType(cudf::type_id type_id) {
-#define CASE_FROM_CUDF(TYPE)                                                   \
-  case cudf::type_id::TYPE:                                                    \
-    return TypeId::TYPE;
-
-  switch (type_id) {
-    APPLY_FOR_TYPE_IDS(CASE_FROM_CUDF);
-  default:
-    return TypeId::EMPTY;
-  }
-
-#undef CASE_FROM_CUDF
-}
-
-constexpr cudf::type_id toCudfType(TypeId type_id) {
-#define CASE_TO_CUDF(TYPE)                                                     \
-  case TypeId::TYPE:                                                           \
-    return cudf::type_id::TYPE;
-
-  switch (type_id) {
-    APPLY_FOR_TYPE_IDS(CASE_TO_CUDF);
-  default:
-    return cudf::type_id::EMPTY;
-  }
-
-#undef CASE_TO_CUDF
-}
-#endif
-
 struct DataTypeTypeVisitor : public arrow::TypeVisitor {
   arrow::Status Visit(const arrow::NullType &type) override {
     type_id = TypeId::EMPTY;
@@ -207,11 +177,6 @@ std::shared_ptr<arrow::DataType> toArrowType(TypeId type_id) {
 
 } // namespace detail
 
-#ifdef USE_CUDF
-DataType::DataType(cudf::type_id type_id_, bool nullable_)
-    : type_id(detail::fromCudfType(type_id_)), nullable(nullable_) {}
-#endif
-
 DataType::DataType(std::shared_ptr<arrow::DataType> data_type, bool nullable_)
     : type_id(detail::fromArrowType(data_type)), nullable(nullable_) {}
 
@@ -222,12 +187,6 @@ std::string DataType::toString() const {
 bool DataType::operator==(const DataType &other) const {
   return type_id == other.type_id && nullable == other.nullable;
 }
-
-#ifdef USE_CUDF
-DataType::operator cudf::data_type() const {
-  return cudf::data_type{detail::toCudfType(type_id)};
-}
-#endif
 
 std::shared_ptr<arrow::DataType> DataType::arrow() const {
   return detail::toArrowType(type_id);

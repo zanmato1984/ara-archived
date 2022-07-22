@@ -6,11 +6,6 @@
 
 #include <arrow/compute/api.h>
 
-#ifdef USE_CUDF
-#include <cudf/concatenate.hpp>
-#include <cudf/join.hpp>
-#endif
-
 namespace cura::kernel {
 
 using cura::data::ColumnVector;
@@ -19,84 +14,6 @@ using cura::type::DataType;
 using cura::type::Schema;
 using cura::type::TypeId;
 
-#ifdef USE_CUDF
-namespace detail {
-
-struct HashJoinImpl {
-  void build(const Context &ctx,
-             std::shared_ptr<const Fragment> build_fragment_,
-             const std::vector<ColumnIdx> &build_keys_) {
-    CURA_ASSERT(!build_fragment && !hash_join, "Re-entering hash join build");
-
-    build_fragment = build_fragment_;
-    std::vector<cudf::size_type> build_keys(build_keys_.size());
-    std::transform(build_keys_.begin(), build_keys_.end(), build_keys.begin(),
-                   [](const auto &build_key) {
-                     return static_cast<cudf::size_type>(build_key);
-                   });
-    hash_join =
-        std::make_unique<cudf::hash_join>(build_fragment->cudf(), build_keys);
-  }
-
-  std::shared_ptr<Fragment> join(const Context &ctx, ThreadId thread_id,
-                                 const Schema &schema, JoinType join_type,
-                                 std::shared_ptr<const Fragment> probe_fragment,
-                                 const std::vector<ColumnIdx> &probe_keys_,
-                                 BuildSide build_side) const {
-    if (!build_fragment) {
-      return nullptr;
-    }
-
-    std::vector<cudf::size_type> probe_keys(probe_keys_.size());
-    std::transform(probe_keys_.begin(), probe_keys_.end(), probe_keys.begin(),
-                   [](const auto &probe_key) {
-                     return static_cast<cudf::size_type>(probe_key);
-                   });
-    auto mr = ctx.memory_resource->preConcatenate(thread_id);
-
-    if (join_type == JoinType::INNER) {
-      auto [probe, build] = hash_join->inner_join(
-          probe_fragment->cudf(), probe_keys, {},
-          cudf::hash_join::common_columns_output_side::PROBE,
-          cudf::null_equality::EQUAL, rmm::cuda_stream_default, mr);
-      auto probe_columns = probe->release();
-      auto build_columns = build->release();
-      if (build_side == BuildSide::LEFT) {
-        build_columns.insert(build_columns.end(),
-                             std::make_move_iterator(probe_columns.begin()),
-                             std::make_move_iterator(probe_columns.end()));
-        auto joined = std::make_unique<cudf::table>(std::move(build_columns));
-        return std::make_shared<Fragment>(schema, std::move(joined));
-      } else {
-        probe_columns.insert(probe_columns.end(),
-                             std::make_move_iterator(build_columns.begin()),
-                             std::make_move_iterator(build_columns.end()));
-        auto joined = std::make_unique<cudf::table>(std::move(probe_columns));
-        return std::make_shared<Fragment>(schema, std::move(joined));
-      }
-    } else if (join_type == JoinType::LEFT) {
-      auto joined = hash_join->left_join(probe_fragment->cudf(), probe_keys, {},
-                                         cudf::null_equality::EQUAL,
-                                         rmm::cuda_stream_default, mr);
-      return std::make_shared<Fragment>(schema, std::move(joined));
-    } else if (join_type == JoinType::FULL) {
-      auto joined = hash_join->full_join(probe_fragment->cudf(), probe_keys, {},
-                                         cudf::null_equality::EQUAL,
-                                         rmm::cuda_stream_default, mr);
-      return std::make_shared<Fragment>(schema, std::move(joined));
-    } else {
-      CURA_FAIL("Unsupported join type " +
-                std::to_string(static_cast<int32_t>(join_type)));
-    }
-  }
-
-private:
-  std::shared_ptr<const Fragment> build_fragment;
-  std::unique_ptr<const cudf::hash_join> hash_join;
-};
-
-} // namespace detail
-#else
 // TODO: Rewrite these shit in a mature arrow fashion, i.e., array data visitors
 // or so.
 namespace detail {
@@ -245,7 +162,6 @@ private:
 };
 
 } // namespace detail
-#endif
 
 HashJoinBuild::HashJoinBuild(KernelId id, Schema schema_,
                              std::vector<ColumnIdx> keys_)

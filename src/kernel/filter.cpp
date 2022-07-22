@@ -6,10 +6,6 @@
 #include <arrow/compute/api.h>
 #include <arrow/visitor.h>
 
-#ifdef USE_CUDF
-#include <cudf/stream_compaction.hpp>
-#endif
-
 namespace cura::kernel {
 
 using cura::data::ColumnScalar;
@@ -53,12 +49,6 @@ Filter::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
   }
 
   auto mask_cv = std::dynamic_pointer_cast<const ColumnVector>(mask);
-#ifdef USE_CUDF
-  auto filtered =
-      cudf::apply_boolean_mask(fragment->cudf(), mask_cv->cudf(),
-                               ctx.memory_resource->preConcatenate(thread_id));
-  return std::make_shared<Fragment>(schema, std::move(filtered));
-#else
   arrow::compute::ExecContext context(
       ctx.memory_resource->preConcatenate(thread_id));
   const auto &filtered = CURA_GET_ARROW_RESULT(arrow::compute::Filter(
@@ -70,7 +60,6 @@ Filter::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
     return nullptr;
   }
   return std::make_shared<Fragment>(filtered.record_batch());
-#endif
 }
 
 } // namespace cura::kernel

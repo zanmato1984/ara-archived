@@ -4,14 +4,6 @@ namespace cura::test::data {
 
 namespace detail {
 
-#ifdef USE_CUDF
-std::shared_ptr<arrow::Array> toArrow(cudf::column_view column) {
-  cudf::table_view table({column});
-  auto arrow_table = cudf::to_arrow(table, {cudf::column_metadata{"foo"}});
-  return arrow_table->column(0)->chunk(0);
-}
-#endif
-
 void assertArrowArraysEqual(const arrow::Array &expected,
                             const arrow::Array &actual, bool verbose) {
   std::stringstream diff;
@@ -36,13 +28,8 @@ void assertArrowArraysEqual(const arrow::Array &expected,
 
 void assertColumnsEqual(const ColumnVector &lhs, const ColumnVector &rhs,
                         bool sort) {
-#ifdef USE_CUDF
-  auto left = detail::toArrow(lhs.cudf());
-  auto right = detail::toArrow(rhs.cudf());
-#else
   auto left = lhs.arrow();
   auto right = rhs.arrow();
-#endif
 
   if (sort) {
     auto left_indices =

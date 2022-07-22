@@ -4,15 +4,9 @@
 
 #include <memory>
 
-#ifdef USE_CUDF
-namespace rmm::mr {
-class device_memory_resource;
-}
-#else
 namespace arrow {
 class MemoryPool;
 }
-#endif
 
 namespace cura::driver {
 struct Option;
@@ -34,11 +28,7 @@ struct MemoryResource {
 
   virtual ~MemoryResource() = default;
 
-#ifdef USE_CUDF
-  using Underlying = rmm::mr::device_memory_resource;
-#else
   using Underlying = arrow::MemoryPool;
-#endif
 
   virtual Underlying *preConcatenate(ThreadId thread_id) const = 0;
   virtual Underlying *concatenate() const = 0;

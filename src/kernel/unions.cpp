@@ -8,11 +8,6 @@
 #include <numeric>
 #include <unordered_set>
 
-#ifdef USE_CUDF
-#include <cudf/concatenate.hpp>
-#include <cudf/stream_compaction.hpp>
-#endif
-
 namespace cura::kernel {
 
 using cura::data::Column;
@@ -27,24 +22,6 @@ void Union::push(const Context &ctx, ThreadId thread_id, KernelId upstream,
   pushed_fragments.emplace_back(fragment);
 }
 
-#ifdef USE_CUDF
-namespace detail {
-
-std::shared_ptr<Fragment> doUnion(const Context &ctx, const Schema &schema,
-                                  std::shared_ptr<const Fragment> fragment) {
-  auto table = fragment->cudf();
-
-  std::vector<cudf::size_type> keys(table.num_columns());
-  std::iota(keys.begin(), keys.end(), 0);
-  auto dedup = cudf::drop_duplicates(
-      table, keys, cudf::duplicate_keep_option::KEEP_FIRST,
-      cudf::null_equality::EQUAL, ctx.memory_resource->converge());
-
-  return std::make_shared<Fragment>(schema, std::move(dedup));
-}
-
-} // namespace detail
-#else
 // TODO: Rewrite these shit in a mature arrow fashion, i.e., array data visitors
 // or so.
 namespace detail {
@@ -209,7 +186,6 @@ std::shared_ptr<Fragment> doUnion(const Context &ctx, const Schema &schema,
 }
 
 } // namespace detail
-#endif
 
 void Union::concatenate(const Context &ctx) const {
   if (pushed_fragments.empty()) {

@@ -4,14 +4,6 @@
 
 namespace cura::data {
 
-#ifdef USE_CUDF
-std::unique_ptr<ColumnScalar>
-createCudfColumnScalar(const DataType &data_type, size_t size,
-                       std::shared_ptr<const cudf::scalar> scalar) {
-  return std::make_unique<ColumnScalarCudf>(data_type, size, scalar);
-}
-#endif
-
 std::unique_ptr<ColumnScalar>
 createArrowColumnScalar(const DataType &data_type, size_t size,
                         std::shared_ptr<arrow::Scalar> scalar) {

@@ -12,12 +12,6 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-#ifdef USE_CUDF
-#include <cudf/column/column_factories.hpp>
-#include <cudf/interop.hpp>
-#include <cudf/utilities/traits.hpp>
-#endif
-
 namespace cura::test::data {
 
 using cura::data::Column;
@@ -31,31 +25,7 @@ using cura::test::database::Table;
 using cura::test::database::TableId;
 using cura::type::DataType;
 
-#ifdef USE_CUDF
-using cura::data::ColumnVectorCudfColumn;
-using cura::data::createCudfColumnScalar;
-using cura::data::createCudfColumnVector;
-#endif
-
 namespace detail {
-
-#ifdef USE_CUDF
-// TODO: This conversion is cumbersome.
-inline std::unique_ptr<ColumnVector>
-toCudf(std::unique_ptr<const ColumnVector> &&arrow) {
-  auto data_type = arrow->dataType();
-  std::vector<std::shared_ptr<const Column>> cvs;
-  cvs.emplace_back(std::move(arrow));
-  Fragment fragment(std::move(cvs));
-  const auto &arrow_table = CURA_GET_ARROW_RESULT(
-      arrow::Table::FromRecordBatches({fragment.arrow()}));
-  auto cudf_table = cudf::from_arrow(*arrow_table);
-  auto cudf_column =
-      std::make_unique<cudf::column>(std::move(cudf_table->get_column(0)));
-  return createCudfColumnVector<ColumnVectorCudfColumn>(data_type,
-                                                        std::move(cudf_column));
-}
-#endif
 
 template <template <typename...> typename Container, typename T>
 struct BaseTypeVisitor : public arrow::TypeVisitor {
@@ -145,24 +115,6 @@ template <typename T>
 inline std::unique_ptr<const ColumnVector>
 makeArrowColumnVectorN(const DataType &data_type, size_t n, T start = 0);
 
-#ifdef USE_CUDF
-template <typename T, template <typename...> typename Container = std::vector>
-std::unique_ptr<ColumnVector>
-makeCudfColumnVector(const DataType &data_type, Container<T> &&data,
-                     std::vector<bool> valid_mask) {
-  auto arrow = makeArrowColumnVector(
-      data_type, std::forward<Container<T>>(data), std::move(valid_mask));
-  return detail::toCudf(std::move(arrow));
-}
-
-template <typename T>
-inline std::unique_ptr<const ColumnVector>
-makeCudfColumnVectorN(const DataType &data_type, size_t n, T start) {
-  auto arrow = makeArrowColumnVectorN(data_type, n, start);
-  return detail::toCudf(std::move(arrow));
-}
-#endif
-
 template <typename T, template <typename...> typename Container>
 inline std::unique_ptr<ColumnVector>
 makeArrowColumnVector(const DataType &data_type, Container<T> &&data,
@@ -205,23 +157,14 @@ template <typename T, template <typename...> typename Container = std::vector>
 inline std::unique_ptr<ColumnVector>
 makeDirectColumnVector(const DataType &data_type, Container<T> &&data,
                        std::vector<bool> valid_mask = {}) {
-#ifdef USE_CUDF
-  return makeCudfColumnVector(data_type, std::forward<Container<T>>(data),
-                              std::move(valid_mask));
-#else
   return makeArrowColumnVector(data_type, std::forward<Container<T>>(data),
                                std::move(valid_mask));
-#endif
 }
 
 template <typename T>
 inline std::unique_ptr<const ColumnVector>
 makeDirectColumnVectorN(const DataType &data_type, size_t n, T start = 0) {
-#ifdef USE_CUDF
-  return makeCudfColumnVectorN(data_type, n, start);
-#else
   return makeArrowColumnVectorN(data_type, n, start);
-#endif
 }
 
 template <typename T>
@@ -232,11 +175,7 @@ makeDirectColumnScalar(const DataType &data_type, T &&value, size_t size) {
                ? Literal(data_type.type_id)
                : Literal(data_type.type_id, std::forward<T>(value));
   }();
-#ifdef USE_CUDF
-  return createCudfColumnScalar(data_type, size, literal.cudf());
-#else
   return createArrowColumnScalar(data_type, size, literal.arrow());
-#endif
 }
 
 template <typename... ColumnVectors>

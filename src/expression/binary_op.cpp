@@ -6,10 +6,6 @@
 #include <algorithm>
 #include <arrow/compute/api.h>
 
-#ifdef USE_CUDF
-#include <cudf/binaryop.hpp>
-#endif
-
 namespace cura::expression {
 
 using cura::data::ColumnScalar;
@@ -17,24 +13,8 @@ using cura::data::ColumnVector;
 using cura::data::createArrowColumnVector;
 using cura::type::TypeId;
 
-#ifdef USE_CUDF
-using cura::data::ColumnVectorCudfColumn;
-using cura::data::createCudfColumnVector;
-#endif
-
 namespace detail {
 
-#ifdef USE_CUDF
-template <cudf::binary_operator op, typename LeftColumn, typename RightColumn>
-std::shared_ptr<const Column> binaryOp(const Context &ctx, ThreadId thread_id,
-                                       LeftColumn &&left, RightColumn &&right,
-                                       const DataType &result_type) {
-  auto res =
-      cudf::binary_operation(left->cudf(), right->cudf(), op, result_type);
-  return createCudfColumnVector<ColumnVectorCudfColumn>(result_type,
-                                                        std::move(res));
-}
-#else
 template <typename LeftColumn, typename RightColumn, typename Op>
 struct BinaryOpHolder : public arrow::TypeVisitor {
   BinaryOpHolder(const Context &ctx_, ThreadId thread_id_, LeftColumn &&left_,
@@ -319,7 +299,6 @@ std::shared_ptr<const Column> logicalOr(const Context &ctx, ThreadId thread_id,
               "Binary op result must be an arrow array");
   return createArrowColumnVector(result_type, res.make_array());
 }
-#endif
 
 template <typename LeftColumn, typename RightColumn>
 std::shared_ptr<const Column>
@@ -328,17 +307,6 @@ dispatchBinaryOperator(const Context &ctx, ThreadId thread_id,
                        BinaryOperator binary_operator,
                        const DataType &result_type) {
   switch (binary_operator) {
-#ifdef USE_CUDF
-#define DO_BINARY_OP(OP, PRETTY)                                               \
-  case BinaryOperator::OP:                                                     \
-    return binaryOp<cudf::binary_operator::OP>(                                \
-        ctx, thread_id, std::forward<LeftColumn>(left),                        \
-        std::forward<RightColumn>(right), result_type);
-
-    APPLY_FOR_BINARY_OPERATORS(DO_BINARY_OP)
-
-#undef DO_BINARY_OP
-#else
   case BinaryOperator::ADD:
     return add(ctx, thread_id, std::forward<LeftColumn>(left),
                std::forward<RightColumn>(right), result_type);
@@ -378,7 +346,6 @@ dispatchBinaryOperator(const Context &ctx, ThreadId thread_id,
   case BinaryOperator::LOGICAL_OR:
     return logicalOr(ctx, thread_id, std::forward<LeftColumn>(left),
                      std::forward<RightColumn>(right), result_type);
-#endif
   default:
     CURA_FAIL("Unimplemented");
   }

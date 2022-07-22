@@ -7,10 +7,6 @@
 #include <arrow/visitor.h>
 #include <map>
 
-#ifdef USE_CUDF
-#include <cudf/sorting.hpp>
-#endif
-
 namespace cura::kernel {
 
 using cura::relational::SortInfo;
@@ -21,42 +17,6 @@ void Sort::push(const Context &ctx, ThreadId thread_id, KernelId upstream,
   pushed_fragments.emplace_back(fragment);
 }
 
-#ifdef USE_CUDF
-namespace detail {
-
-std::shared_ptr<Fragment>
-doSort(const Context &ctx, const Schema &schema,
-       const std::vector<PhysicalSortInfo> &sort_infos,
-       std::shared_ptr<const Fragment> fragment) {
-  std::vector<cudf::column_view> key_columns(sort_infos.size());
-  std::transform(sort_infos.begin(), sort_infos.end(), key_columns.begin(),
-                 [&](const auto &sort_info) {
-                   return fragment->column(sort_info.idx)->cudf();
-                 });
-  std::vector<cudf::order> column_orders(sort_infos.size());
-  std::transform(sort_infos.begin(), sort_infos.end(), column_orders.begin(),
-                 [](const auto &sort_info) {
-                   return sort_info.order == SortInfo::Order::ASCENDING
-                              ? cudf::order::ASCENDING
-                              : cudf::order::DESCENDING;
-                 });
-  std::vector<cudf::null_order> null_orders(sort_infos.size());
-  std::transform(sort_infos.begin(), sort_infos.end(), null_orders.begin(),
-                 [](const auto &sort_info) {
-                   return sort_info.null_order == SortInfo::NullOrder::FIRST
-                              ? cudf::null_order::BEFORE
-                              : cudf::null_order::AFTER;
-                 });
-
-  cudf::table_view key_table(key_columns);
-  auto result = cudf::sort_by_key(fragment->cudf(), key_table, column_orders,
-                                  null_orders, ctx.memory_resource->converge());
-
-  return std::make_shared<Fragment>(schema, std::move(result));
-}
-
-} // namespace detail
-#else
 namespace detail {
 
 struct SortTypeVisitor : public arrow::TypeVisitor {
@@ -202,7 +162,6 @@ doSort(const Context &ctx, const Schema &schema,
 }
 
 } // namespace detail
-#endif
 
 void Sort::concatenate(const Context &ctx) const {
   if (pushed_fragments.empty()) {
