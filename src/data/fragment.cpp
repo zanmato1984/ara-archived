@@ -8,10 +8,10 @@ Fragment::Fragment(std::vector<std::shared_ptr<const Column>> columns_)
     : columns(std::move(columns_)) {
   ARA_ASSERT(!columns.empty(), "No column in fragment");
   ARA_ASSERT(std::all_of(columns.begin(), columns.end(),
-                          [size = columns[0]->size()](const auto &column) {
-                            return column->size() == size;
-                          }),
-              "Mismatched sizes between fragment columns");
+                         [size = columns[0]->size()](const auto &column) {
+                           return column->size() == size;
+                         }),
+             "Mismatched sizes between fragment columns");
 }
 
 Fragment::Fragment(std::shared_ptr<arrow::RecordBatch> record_batch) {

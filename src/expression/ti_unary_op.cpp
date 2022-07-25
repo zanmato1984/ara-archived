@@ -14,8 +14,7 @@ std::string TiUnaryOp::unaryOperatorToString(UnaryOperator op) {
   switch (op) {
     APPLY_FOR_TI_UNARY_OPERATORS(UNARY_OP_CASE);
   default:
-    ARA_FAIL("Unknown ti unary op " +
-              std::to_string(static_cast<int32_t>(op)));
+    ARA_FAIL("Unknown ti unary op " + std::to_string(static_cast<int32_t>(op)));
   }
 
 #undef UNARY_OP_CASE
@@ -29,8 +28,7 @@ std::string TiUnaryOp::unaryOperatorPretty(UnaryOperator op) {
   switch (op) {
     APPLY_FOR_TI_UNARY_OPERATORS(UNARY_OP_CASE);
   default:
-    ARA_FAIL("Unknown ti unary op " +
-              std::to_string(static_cast<int32_t>(op)));
+    ARA_FAIL("Unknown ti unary op " + std::to_string(static_cast<int32_t>(op)));
   }
 
 #undef UNARY_OP_CASE
@@ -39,7 +37,7 @@ std::string TiUnaryOp::unaryOperatorPretty(UnaryOperator op) {
 TiUnaryOp::UnaryOperator
 TiUnaryOp::unaryOperatorFromString(const std::string &s) {
 #define UNARY_OP_CASE(OP, PRETTY)                                              \
-  if (s == ARA_STRINGIFY(OP)) {                                               \
+  if (s == ARA_STRINGIFY(OP)) {                                                \
     return UnaryOperator::OP;                                                  \
   }
 

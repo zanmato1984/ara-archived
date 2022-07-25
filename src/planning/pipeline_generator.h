@@ -123,7 +123,7 @@ public:
 
 private:
   template <typename KernelType, typename... Args>
-  std::shared_ptr<KernelType> makeKernel(Args &&... args) {
+  std::shared_ptr<KernelType> makeKernel(Args &&...args) {
     return std::make_shared<KernelType>(current_kernel_id++,
                                         std::forward<Args>(args)...);
   }

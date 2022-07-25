@@ -209,18 +209,23 @@ std::shared_ptr<arrow::Scalar> dispatchAggregationOperatorColumnVector(
   arrow::compute::ExecContext context(ctx.memory_resource->converge());
   switch (aggregation.op) {
   case AggregationOperator::SUM:
-    return ARA_GET_ARROW_RESULT(arrow::compute::Sum(column, arrow::compute::ScalarAggregateOptions::Defaults(), &context))
+    return ARA_GET_ARROW_RESULT(
+               arrow::compute::Sum(
+                   column, arrow::compute::ScalarAggregateOptions::Defaults(),
+                   &context))
         .scalar();
   case AggregationOperator::MIN:
     return ARA_GET_ARROW_RESULT(
                arrow::compute::MinMax(
-                   column, arrow::compute::ScalarAggregateOptions::Defaults(), &context))
+                   column, arrow::compute::ScalarAggregateOptions::Defaults(),
+                   &context))
         .scalar_as<arrow::StructScalar>()
         .value[0];
   case AggregationOperator::MAX:
     return ARA_GET_ARROW_RESULT(
                arrow::compute::MinMax(
-                   column, arrow::compute::ScalarAggregateOptions::Defaults(), &context))
+                   column, arrow::compute::ScalarAggregateOptions::Defaults(),
+                   &context))
         .scalar_as<arrow::StructScalar>()
         .value[1];
   case AggregationOperator::COUNT_VALID:
@@ -231,7 +236,10 @@ std::shared_ptr<arrow::Scalar> dispatchAggregationOperatorColumnVector(
   case AggregationOperator::COUNT_ALL:
     return std::make_shared<arrow::Int64Scalar>(column->length());
   case AggregationOperator::MEAN:
-    return ARA_GET_ARROW_RESULT(arrow::compute::Mean(column, arrow::compute::ScalarAggregateOptions::Defaults(), &context))
+    return ARA_GET_ARROW_RESULT(
+               arrow::compute::Mean(
+                   column, arrow::compute::ScalarAggregateOptions::Defaults(),
+                   &context))
         .scalar();
   case AggregationOperator::NTH_ELEMENT:
     if (column->length() == 0) {
@@ -240,7 +248,7 @@ std::shared_ptr<arrow::Scalar> dispatchAggregationOperatorColumnVector(
     return ARA_GET_ARROW_RESULT(column->GetScalar(aggregation.n));
   default:
     ARA_FAIL("Unsupported aggregation operator: " +
-              aggregationOperatorToString(aggregation.op));
+             aggregationOperatorToString(aggregation.op));
   }
 }
 
@@ -258,7 +266,7 @@ dispatchAggregationOperatorColumnScalar(std::shared_ptr<arrow::Scalar> scalar,
     return std::make_shared<arrow::Int64Scalar>(size);
   default:
     ARA_FAIL("Unsupported aggregation operator: " +
-              aggregationOperatorToString(op));
+             aggregationOperatorToString(op));
   }
 }
 
@@ -324,9 +332,8 @@ doAggregate(const Context &ctx, const Schema &schema,
       auto it = indices.find(key_values);
       if (it == indices.end()) {
         std::unique_ptr<arrow::ArrayBuilder> builder;
-        ARA_ASSERT_ARROW_OK(
-            arrow::MakeBuilder(pool, arrow::uint64(), &builder),
-            "Create indices builder failed");
+        ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, arrow::uint64(), &builder),
+                            "Create indices builder failed");
         std::tie(it, std::ignore) = indices.emplace(
             std::move(key_values), std::make_pair(std::move(builder), nullptr));
       }
@@ -336,7 +343,7 @@ doAggregate(const Context &ctx, const Schema &schema,
     }
     for (auto &entry : indices) {
       ARA_ASSERT_ARROW_OK(entry.second.first->Finish(&entry.second.second),
-                           "Finish indices failed");
+                          "Finish indices failed");
     }
   }
 
@@ -344,9 +351,8 @@ doAggregate(const Context &ctx, const Schema &schema,
   {
     for (size_t i = 0; i < keys.size(); i++) {
       std::unique_ptr<arrow::ArrayBuilder> builder;
-      ARA_ASSERT_ARROW_OK(
-          arrow::MakeBuilder(pool, schema[i].arrow(), &builder),
-          "Create group builder failed");
+      ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, schema[i].arrow(), &builder),
+                          "Create group builder failed");
       AppendScalarTypeVisitor visitor(*builder);
       for (const auto &entry : indices) {
         visitor.scalar = entry.first[i];
@@ -377,11 +383,10 @@ doAggregate(const Context &ctx, const Schema &schema,
             dispatchAggregationOperatorColumnVector(ctx, array, aggregation);
         visitor.scalar = scalar;
         ARA_ASSERT_ARROW_OK(arrow::VisitTypeInline(*scalar->type, &visitor),
-                             "Gather aggregation scalar failed");
+                            "Gather aggregation scalar failed");
       }
       std::shared_ptr<arrow::Array> array;
-      ARA_ASSERT_ARROW_OK(builder->Finish(&array),
-                           "Finish aggregation failed");
+      ARA_ASSERT_ARROW_OK(builder->Finish(&array), "Finish aggregation failed");
       results.emplace_back(
           createArrowColumnVector(aggregation.data_type, array));
     }
@@ -390,4 +395,4 @@ doAggregate(const Context &ctx, const Schema &schema,
   return std::make_shared<Fragment>(std::move(results));
 }
 
-} // namespace detail
+} // namespace ara::kernel::detail

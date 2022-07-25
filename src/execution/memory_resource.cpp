@@ -10,15 +10,12 @@ namespace ara::execution {
 
 namespace detail {
 
-template <typename T>
-struct LightWeightMemoryResource : public MemoryResource {
-  explicit LightWeightMemoryResource(const Option &option)
-  {
+template <typename T> struct LightWeightMemoryResource : public MemoryResource {
+  explicit LightWeightMemoryResource(const Option &option) {
     l = arrow::MemoryPool::CreateDefault();
   }
 
-  ~LightWeightMemoryResource() {
-  }
+  ~LightWeightMemoryResource() {}
 
   Underlying *preConcatenate(ThreadId thread_id) const override {
     return l.get();
@@ -48,22 +45,20 @@ private:
 template <typename T>
 struct LightWeightPerThreadMemoryResource : public MemoryResource {
   LightWeightPerThreadMemoryResource(const Option &option)
-      :
-        thread_ls(option.threads_per_pipeline) {
+      : thread_ls(option.threads_per_pipeline) {
     l = arrow::MemoryPool::CreateDefault();
     for (size_t i = 0; i < option.threads_per_pipeline; i++) {
       thread_ls[i] = arrow::MemoryPool::CreateDefault();
     }
   }
 
-  ~LightWeightPerThreadMemoryResource() {
-  }
+  ~LightWeightPerThreadMemoryResource() {}
 
   Underlying *preConcatenate(ThreadId thread_id) const override {
     ARA_ASSERT(thread_id < thread_ls.size(),
-                "LightWeightPerThreadMemoryResource invalid thread ID " +
-                    std::to_string(thread_id) + " (" +
-                    std::to_string(thread_ls.size()) + " threads in total)");
+               "LightWeightPerThreadMemoryResource invalid thread ID " +
+                   std::to_string(thread_id) + " (" +
+                   std::to_string(thread_ls.size()) + " threads in total)");
     return thread_ls[thread_id].get();
   }
 
@@ -146,7 +141,7 @@ std::unique_ptr<MemoryResource> createMemoryResource(const Option &option) {
     return std::make_unique<detail::CudaMemoryResource>(option);
   default:
     ARA_FAIL("Unsupported memory resource type: " +
-              std::to_string(option.memory_resource));
+             std::to_string(option.memory_resource));
   }
 }
 

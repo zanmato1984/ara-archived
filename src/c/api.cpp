@@ -36,7 +36,7 @@ size_t exportArrowFragment(std::shared_ptr<const Fragment> fragment,
 
   auto rb = fragment->arrow();
   ARA_ASSERT_ARROW_OK(arrow::ExportRecordBatch(*rb, out, schema),
-                       "Export record batch failed");
+                      "Export record batch failed");
   return 1;
 }
 

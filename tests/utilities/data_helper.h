@@ -41,23 +41,23 @@ struct BaseTypeVisitor : public arrow::TypeVisitor {
     auto pool = arrow::default_memory_pool();
     std::unique_ptr<arrow::ArrayBuilder> builder;
     ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, data_type.arrow(), &builder),
-                         "Creating arrow column builder failed");
+                        "Creating arrow column builder failed");
     auto type_builder = dynamic_cast<BuilderType *>(builder.get());
     ARA_ASSERT(type_builder, "Cast to concrete builder failed");
     size_t i_valid_mask = 0;
     for (const auto &v : container) {
       if (!data_type.nullable || valid_mask[i_valid_mask]) {
         ARA_ASSERT_ARROW_OK(type_builder->Append(v),
-                             "Append to arrow array failed");
+                            "Append to arrow array failed");
       } else {
         ARA_ASSERT_ARROW_OK(type_builder->AppendNull(),
-                             "Append null to arrow array failed");
+                            "Append null to arrow array failed");
       }
       i_valid_mask++;
     }
     std::shared_ptr<arrow::Array> array;
     ARA_ASSERT_ARROW_OK(type_builder->Finish(&array),
-                         "Finish arrow build failed");
+                        "Finish arrow build failed");
 
     cv = createArrowColumnVector(data_type, array);
     return arrow::Status::OK();
@@ -121,7 +121,7 @@ makeArrowColumnVector(const DataType &data_type, Container<T> &&data,
                       std::vector<bool> valid_mask) {
   if (data_type.nullable) {
     ARA_ASSERT(data.size() == valid_mask.size(),
-                "Mismatched sizes between data and valid mask");
+               "Mismatched sizes between data and valid mask");
   }
 
   std::unique_ptr<detail::BaseTypeVisitor<Container, T>> visitor;
@@ -141,7 +141,7 @@ makeArrowColumnVector(const DataType &data_type, Container<T> &&data,
 #undef MAKE_TYPE_VISITOR
 
   ARA_ASSERT_ARROW_OK(data_type.arrow()->Accept(visitor.get()),
-                       "Create arrow array failed");
+                      "Create arrow array failed");
   return std::move(visitor->cv);
 }
 
@@ -179,7 +179,7 @@ makeDirectColumnScalar(const DataType &data_type, T &&value, size_t size) {
 }
 
 template <typename... ColumnVectors>
-inline std::shared_ptr<const Fragment> makeFragment(ColumnVectors &&... cvs) {
+inline std::shared_ptr<const Fragment> makeFragment(ColumnVectors &&...cvs) {
   std::vector<std::shared_ptr<const Column>> vc;
   vc.reserve(sizeof...(ColumnVectors));
   (vc.emplace_back(std::forward<ColumnVectors>(cvs)), ...);
@@ -189,10 +189,10 @@ inline std::shared_ptr<const Fragment> makeFragment(ColumnVectors &&... cvs) {
 void assertColumnsEqual(const ColumnVector &lhs, const ColumnVector &rhs,
                         bool sort = false);
 
-#define ARA_TEST_EXPECT_COLUMNS_EQUAL(lhs, rhs...)                            \
+#define ARA_TEST_EXPECT_COLUMNS_EQUAL(lhs, rhs...)                             \
   ara::test::data::assertColumnsEqual(*lhs, *rhs)
 
-#define ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(lhs, rhs...)                    \
+#define ARA_TEST_EXPECT_COLUMNS_EQUAL_ORDERED(lhs, rhs...)                     \
   ara::test::data::assertColumnsEqual(*lhs, *rhs, true)
 
 } // namespace ara::test::data

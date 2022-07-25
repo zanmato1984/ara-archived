@@ -9,9 +9,9 @@ ColumnRef::evaluate(const Context &ctx, ThreadId thread_id,
                     const Fragment &fragment) const {
   ARA_ASSERT(idx < fragment.numColumns(), "Column idx overflow");
   ARA_ASSERT(fragment.column(idx)->dataType() == data_type,
-              "Mismatched data type " +
-                  fragment.column(idx)->dataType().toString() + " vs. " +
-                  data_type.toString());
+             "Mismatched data type " +
+                 fragment.column(idx)->dataType().toString() + " vs. " +
+                 data_type.toString());
   return fragment.column(idx);
 }
 

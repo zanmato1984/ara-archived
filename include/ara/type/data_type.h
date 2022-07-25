@@ -55,7 +55,7 @@ inline std::string typeIdToString(TypeId type_id) {
     APPLY_FOR_TYPE_IDS(TYPE_ID_CASE);
   default:
     ARA_FAIL("Unknown type id " +
-              std::to_string(static_cast<int32_t>(type_id)));
+             std::to_string(static_cast<int32_t>(type_id)));
   }
 
 #undef TYPE_ID_CASE
@@ -63,7 +63,7 @@ inline std::string typeIdToString(TypeId type_id) {
 
 inline TypeId typeIdFromString(const std::string &s) {
 #define TYPE_ID_CASE(TYPE)                                                     \
-  if (s == ARA_STRINGIFY(TYPE)) {                                             \
+  if (s == ARA_STRINGIFY(TYPE)) {                                              \
     return TypeId::TYPE;                                                       \
   }
 

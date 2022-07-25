@@ -51,7 +51,7 @@ struct EvenlyParallelCppDriver {
         /// Input source.
         auto table_it = tables.find(source_id);
         ARA_ASSERT(table_it != tables.end(),
-                    "Table " + std::to_string(source_id) + " not found");
+                   "Table " + std::to_string(source_id) + " not found");
         const auto &table = table_it->second;
         size_t fragments_per_thread =
             std::ceil(double(table.fragments.size()) / parallelism);

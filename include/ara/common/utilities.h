@@ -7,7 +7,7 @@ namespace ara {
 
 template <typename ID> inline SourceId makeHeapSourceId(ID id) {
   ARA_ASSERT(id > 0,
-              "Making heap source ID from a non-positive ID is not allowed");
+             "Making heap source ID from a non-positive ID is not allowed");
   return -static_cast<SourceId>(id);
 }
 

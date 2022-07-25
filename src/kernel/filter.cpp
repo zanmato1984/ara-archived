@@ -38,13 +38,13 @@ Filter::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
                    std::shared_ptr<const Fragment> fragment) const {
   auto mask = condition->evaluate(ctx, thread_id, *fragment);
   ARA_ASSERT(mask->dataType().type_id == TypeId::BOOL8,
-              "Mask must be bool type");
+             "Mask must be bool type");
 
   if (auto mask_cs = std::dynamic_pointer_cast<const ColumnScalar>(mask);
       mask_cs) {
     detail::ScalarVisitor visitor;
     ARA_ASSERT_ARROW_OK(arrow::VisitScalarInline(*mask_cs->arrow(), &visitor),
-                         "Get arrow scalar value failed");
+                        "Get arrow scalar value failed");
     return visitor.value ? fragment : nullptr;
   }
 
@@ -55,7 +55,7 @@ Filter::streamImpl(const Context &ctx, ThreadId thread_id, KernelId upstream,
       fragment->arrow(), mask_cv->arrow(),
       arrow::compute::FilterOptions::Defaults(), &context));
   ARA_ASSERT(filtered.kind() == arrow::Datum::RECORD_BATCH,
-              "Filter result must be an arrow record batch");
+             "Filter result must be an arrow record batch");
   if (filtered.record_batch()->num_rows() == 0) {
     return nullptr;
   }

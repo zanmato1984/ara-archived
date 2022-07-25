@@ -51,17 +51,17 @@ struct JoinConditionParser
       auto right =
           std::dynamic_pointer_cast<const BinaryOp>(binary_op->right());
       ARA_ASSERT(left &&
-                      (left->binaryOperator() == BinaryOperator::EQUAL ||
-                       left->binaryOperator() == BinaryOperator::LOGICAL_AND) &&
-                      right &&
-                      (right->binaryOperator() == BinaryOperator::EQUAL ||
-                       right->binaryOperator() == BinaryOperator::LOGICAL_AND),
-                  "Join condition must be all conjunctions: " +
-                      binary_op->toString());
+                     (left->binaryOperator() == BinaryOperator::EQUAL ||
+                      left->binaryOperator() == BinaryOperator::LOGICAL_AND) &&
+                     right &&
+                     (right->binaryOperator() == BinaryOperator::EQUAL ||
+                      right->binaryOperator() == BinaryOperator::LOGICAL_AND),
+                 "Join condition must be all conjunctions: " +
+                     binary_op->toString());
     } break;
     default:
       ARA_FAIL("Invalid binary operator in join condition: " +
-                binary_op->toString());
+               binary_op->toString());
     }
   }
 
@@ -79,15 +79,15 @@ parseJoinCondition(const std::shared_ptr<const RelHashJoin> &hash_join) {
   parser.visit(hash_join->condition());
   auto join_keys = std::move(parser.join_keys);
   ARA_ASSERT(join_keys.first.size() == join_keys.second.size(),
-              "Mismatched left and right keys " +
-                  std::to_string(join_keys.first.size()) + ":" +
-                  std::to_string(join_keys.second.size()));
+             "Mismatched left and right keys " +
+                 std::to_string(join_keys.first.size()) + ":" +
+                 std::to_string(join_keys.second.size()));
   for (size_t i = 0; i < join_keys.first.size(); i++) {
     ARA_ASSERT(join_keys.first[i]->dataType() ==
-                    join_keys.second[i]->dataType(),
-                "Mismatched type between left and right key " +
-                    join_keys.first[i]->dataType().toString() + ":" +
-                    join_keys.second[i]->dataType().toString());
+                   join_keys.second[i]->dataType(),
+               "Mismatched type between left and right key " +
+                   join_keys.first[i]->dataType().toString() + ":" +
+                   join_keys.second[i]->dataType().toString());
   }
   return join_keys;
 }

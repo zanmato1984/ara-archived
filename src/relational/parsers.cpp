@@ -58,7 +58,7 @@ inline double jsonFloat(const rapidjson::Value &obj) {
 
 inline double jsonDouble(const rapidjson::Value &obj) {
   ARA_ASSERT_JSON(obj.IsDouble() || obj.IsFloat() || obj.IsInt() ||
-                   obj.IsInt64() || obj.IsUint() || obj.IsUint64());
+                  obj.IsInt64() || obj.IsUint() || obj.IsUint64());
   return obj.GetDouble();
 }
 
@@ -146,7 +146,7 @@ std::shared_ptr<const Expression> parseLiteral(const rapidjson::Value &json) {
   }
   default:
     ARA_FAIL("Invalid literal type " +
-              std::to_string(static_cast<int32_t>(type_id)));
+             std::to_string(static_cast<int32_t>(type_id)));
   }
 }
 
@@ -303,7 +303,7 @@ void parseHashJoin(const rapidjson::Value &rel,
   auto build_side = BuildSide::RIGHT;
   if (rel.HasMember("build_side")) {
     ARA_ASSERT(join_type == JoinType::INNER,
-                "Specifying build side can only be used for inner join");
+               "Specifying build side can only be used for inner join");
     const auto &build_side_json = jsonField(rel, "build_side");
     auto build_side_str = jsonString(build_side_json);
     build_side = buildSideFromString(build_side_str);
@@ -431,8 +431,8 @@ std::shared_ptr<const Rel> parseJson(const std::string &json) {
   if (doc.HasParseError()) {
     doc.GetParseError();
     ARA_FAIL("Failed to parse plan from json (offset " +
-              std::to_string(doc.GetErrorOffset()) +
-              "): " + rapidjson::GetParseError_En(doc.GetParseError()));
+             std::to_string(doc.GetErrorOffset()) +
+             "): " + rapidjson::GetParseError_En(doc.GetParseError()));
   }
   ARA_ASSERT_JSON(doc.IsObject());
   const auto &rels = detail::jsonField(doc, "rels");

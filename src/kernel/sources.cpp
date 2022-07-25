@@ -43,7 +43,7 @@ std::shared_ptr<const Fragment> HeapSource::streamImpl(
     const Context &ctx, ThreadId thread_id, KernelId upstream,
     std::shared_ptr<const Fragment> fragment, size_t rows) const {
   ARA_ASSERT(!fragment,
-              "fragment for " + name() + "'s streamImpl must be null");
+             "fragment for " + name() + "'s streamImpl must be null");
 
   auto heap_fragment = kernel->heapFragment();
   if (current_row >= heap_fragment->size()) {

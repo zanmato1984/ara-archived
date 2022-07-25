@@ -32,7 +32,7 @@ std::string UnaryOp::unaryOperatorPretty(UnaryOperator op) {
 
 UnaryOp::UnaryOperator UnaryOp::unaryOperatorFromString(const std::string &s) {
 #define UNARY_OP_CASE(OP, PRETTY)                                              \
-  if (s == ARA_STRINGIFY(OP)) {                                               \
+  if (s == ARA_STRINGIFY(OP)) {                                                \
     return UnaryOperator::OP;                                                  \
   }
 

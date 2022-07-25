@@ -114,7 +114,7 @@ struct Terminal : public Kernel {
                     std::vector<std::shared_ptr<const NonStreamKernel>> kernels)
       : Kernel(id), non_stream_kernels(std::move(kernels)) {
     ARA_ASSERT(!non_stream_kernels.empty(),
-                "No kernels in " + name() + " kernel");
+               "No kernels in " + name() + " kernel");
   }
 
   std::string name() const override { return "Terminal"; }

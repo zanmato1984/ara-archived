@@ -35,7 +35,7 @@ concatFragments(MemoryResource::Underlying *underlying, const Schema &schema,
       for (const auto &fragment : fragments) {
         auto next_cs = fragment->column<ColumnScalar>(i_col);
         ARA_ASSERT(next_cs && next_cs->arrow()->Equals(cs->arrow()),
-                    "Mismatched column scalar between fragments");
+                   "Mismatched column scalar between fragments");
         size += next_cs->size();
       }
       auto concated = createArrowColumnScalar(data_type, size, cs->arrow());

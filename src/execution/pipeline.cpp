@@ -73,7 +73,7 @@ std::shared_ptr<Node> buildTree(const Pipeline &pipeline) {
   for (auto source_id : pipeline.source_ids) {
     auto source_it = pipeline.sources.find(source_id);
     ARA_ASSERT(source_it != pipeline.sources.end(),
-                "Source " + std::to_string(source_id) + " not found");
+               "Source " + std::to_string(source_id) + " not found");
     auto source_kernel = source_it->second;
     children.emplace_back(std::make_shared<Node>(source_kernel));
   }
@@ -128,16 +128,16 @@ void stringifyTreeHorizontal(
   for (size_t i = 0; i < root->children.size(); i++) {
     auto line_it = line_map.find(root->children[i].first);
     ARA_ASSERT(line_it != line_map.end(),
-                "Couldn't find line for kernel " +
-                    root->children[i].first->kernel->toString());
+               "Couldn't find line for kernel " +
+                   root->children[i].first->kernel->toString());
     auto line_id = line_it->second;
     if (i == 0) {
       first_line = line_id;
       last_line = line_id;
     } else {
       ARA_ASSERT(last_line < line_it->second,
-                  "Invalid line for kernel " +
-                      root->children[i].first->kernel->toString());
+                 "Invalid line for kernel " +
+                     root->children[i].first->kernel->toString());
       last_line = line_id;
     }
     lines[line_id] += ' ';
@@ -194,7 +194,7 @@ void Pipeline::push(const Context &ctx, ThreadId thread_id, SourceId source_id,
   ARA_ASSERT(!is_final, "push is not allowed for a final pipeline");
   if (isHeapSourceId(source_id)) {
     ARA_ASSERT(!fragment,
-                "push an heap source with not-null fragment is not allowed");
+               "push an heap source with not-null fragment is not allowed");
   }
   getSource(source_id)->push(ctx, thread_id, VoidKernelId, fragment);
 }
@@ -205,7 +205,7 @@ Pipeline::stream(const Context &ctx, ThreadId thread_id, SourceId source_id,
   ARA_ASSERT(is_final, "stream is not allowed for a non-final pipeline");
   if (isHeapSourceId(source_id)) {
     ARA_ASSERT(!fragment,
-                "stream an heap source with not-null fragment is not allowed");
+               "stream an heap source with not-null fragment is not allowed");
   }
   return getSource(source_id)->stream(ctx, thread_id, VoidKernelId, fragment,
                                       rows);
@@ -233,7 +233,7 @@ std::string Pipeline::toString() const {
 std::shared_ptr<const Source> Pipeline::getSource(SourceId source_id) const {
   auto source_it = sources.find(source_id);
   ARA_ASSERT(source_it != sources.end(),
-              "Source " + std::to_string(source_id) + " not found");
+             "Source " + std::to_string(source_id) + " not found");
   return source_it->second;
 }
 

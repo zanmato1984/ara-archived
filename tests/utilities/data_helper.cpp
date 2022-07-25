@@ -33,10 +33,10 @@ void assertColumnsEqual(const ColumnVector &lhs, const ColumnVector &rhs,
 
   if (sort) {
     auto left_indices =
-        ARA_GET_ARROW_RESULT(arrow::compute::SortToIndices(*left));
+        ARA_GET_ARROW_RESULT(arrow::compute::SortIndices(*left));
     left = ARA_GET_ARROW_RESULT(arrow::compute::Take(*left, *left_indices));
     auto right_indices =
-        ARA_GET_ARROW_RESULT(arrow::compute::SortToIndices(*right));
+        ARA_GET_ARROW_RESULT(arrow::compute::SortIndices(*right));
     right = ARA_GET_ARROW_RESULT(arrow::compute::Take(*right, *right_indices));
   }
 

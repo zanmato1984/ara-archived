@@ -45,7 +45,7 @@ inline std::string aggregationOperatorToString(AggregationOperator op) {
     APPLY_FOR_AGGREGATION_OPERATORS(AGGREGATION_OP_CASE);
   default:
     ARA_FAIL("Unknown aggregation op " +
-              std::to_string(static_cast<int32_t>(op)));
+             std::to_string(static_cast<int32_t>(op)));
   }
 
 #undef AGGREGATION_OP_CASE
@@ -53,7 +53,7 @@ inline std::string aggregationOperatorToString(AggregationOperator op) {
 
 inline AggregationOperator aggregationOperatorFromString(const std::string &s) {
 #define AGGREGATION_OP_CASE(OP)                                                \
-  if (s == ARA_STRINGIFY(OP)) {                                               \
+  if (s == ARA_STRINGIFY(OP)) {                                                \
     return AggregationOperator::OP;                                            \
   }
 

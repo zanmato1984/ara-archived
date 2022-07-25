@@ -13,9 +13,9 @@ extractYear(const Context &ctx, ThreadId thread_id,
             std::shared_ptr<const ColumnVector> cv,
             const DataType &result_type) {
   ARA_ASSERT(cv->dataType().type_id == TypeId::INT64,
-              "Extract year requires int64 operand");
+             "Extract year requires int64 operand");
   ARA_ASSERT(result_type.type_id == TypeId::INT64,
-              "Extract year's result should be int64");
+             "Extract year's result should be int64");
 
   const auto &input_array = cv->arrow();
   auto output_array = [&]() {

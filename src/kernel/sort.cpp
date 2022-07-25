@@ -91,7 +91,7 @@ struct RowCompare {
       ARA_ASSERT(l[i]->type->Equals(r[i]->type), "Mismatched type");
       SortTypeVisitor visitor(desc[i], null_last[i], l[i], r[i]);
       ARA_ASSERT_ARROW_OK(arrow::VisitTypeInline(*l[i]->type, &visitor),
-                           "Compare row failed");
+                          "Compare row failed");
       if (visitor.result < 0) {
         return true;
       } else if (visitor.result > 0) {
@@ -143,13 +143,13 @@ doSort(const Context &ctx, const Schema &schema,
   {
     std::unique_ptr<arrow::ArrayBuilder> builder;
     ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, arrow::uint64(), &builder),
-                         "Create indices builder failed");
+                        "Create indices builder failed");
     auto indices_builder = dynamic_cast<arrow::UInt64Builder *>(builder.get());
     ARA_ASSERT(indices_builder, "Dynamic cast of indices builder failed");
 
     for (const auto &entry : map) {
       ARA_ASSERT_ARROW_OK(indices_builder->Append(entry.second),
-                           "Append indices failed");
+                          "Append indices failed");
     }
 
     ARA_ASSERT_ARROW_OK(builder->Finish(&indices), "Finish indices failed");

@@ -10,11 +10,11 @@
 
 namespace ara::test::database {
 
-#define ARA_ASSERT_C(cond)                                                    \
+#define ARA_ASSERT_C(cond)                                                     \
   {                                                                            \
     auto error = (cond);                                                       \
-    ARA_ASSERT(!error,                                                        \
-                "ARA C API call failed with error " + std::to_string(error)); \
+    ARA_ASSERT(!error,                                                         \
+               "ARA C API call failed with error " + std::to_string(error));   \
   }
 
 // TODO: Consider generalize the parallelism and how evenly it would be so that
@@ -43,7 +43,7 @@ struct EvenlyParallelCDriver {
                                              nullptr, &output, &schema,
                                              rows_per_heap_thread);
                   ARA_ASSERT(res >= 0, "Pipeline stream failed with error " +
-                                            std::to_string(res));
+                                           std::to_string(res));
 
                   while (res > 0) {
                     auto rb = ARA_GET_ARROW_RESULT(
@@ -61,7 +61,7 @@ struct EvenlyParallelCDriver {
                                           nullptr, &output, &schema,
                                           rows_per_heap_thread);
                     ARA_ASSERT(res >= 0, "Pipeline stream failed with error " +
-                                              std::to_string(res));
+                                             std::to_string(res));
                   }
                 }));
           }
@@ -76,7 +76,7 @@ struct EvenlyParallelCDriver {
         /// Input source.
         auto table_it = tables.find(source_id);
         ARA_ASSERT(table_it != tables.end(),
-                    "Table " + std::to_string(source_id) + " not found");
+                   "Table " + std::to_string(source_id) + " not found");
         const auto &table = table_it->second;
         size_t fragments_per_thread =
             std::ceil(double(table.fragments.size()) / parallelism);
@@ -92,8 +92,8 @@ struct EvenlyParallelCDriver {
                     ArrowArray input{};
                     ArrowSchema input_schema{};
                     ARA_ASSERT_ARROW_OK(arrow::ExportRecordBatch(
-                                             *input_rb, &input, &input_schema),
-                                         "Export record batch failed");
+                                            *input_rb, &input, &input_schema),
+                                        "Export record batch failed");
 
                     if (is_pipeline_final(driver)) {
                       /// Stream the input fragment and sink the result.
@@ -103,8 +103,8 @@ struct EvenlyParallelCDriver {
                                                  &input, &input_schema, &output,
                                                  &output_schema, 0);
                       ARA_ASSERT(res >= 0,
-                                  "Pipeline stream failed with error " +
-                                      std::to_string(res));
+                                 "Pipeline stream failed with error " +
+                                     std::to_string(res));
                       if (res > 0) {
                         auto output_rb = ARA_GET_ARROW_RESULT(
                             arrow::ImportRecordBatch(&output, &output_schema));
@@ -120,7 +120,7 @@ struct EvenlyParallelCDriver {
                     } else {
                       /// Push the input fragment into pipeline.
                       ARA_ASSERT_C(pipeline_push(driver, thread, source_id,
-                                                  &input, &input_schema));
+                                                 &input, &input_schema));
                     }
                   }
                 }

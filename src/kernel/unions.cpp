@@ -49,9 +49,8 @@ struct UnionTypeVisitor : public arrow::TypeVisitor {
     auto pool = arrow::default_memory_pool();
     std::unique_ptr<arrow::ArrayBuilder> builder;
     {
-      ARA_ASSERT_ARROW_OK(
-          arrow::MakeBuilder(pool, data_type.arrow(), &builder),
-          "Creating arrow column builder failed");
+      ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, data_type.arrow(), &builder),
+                          "Creating arrow column builder failed");
     }
     auto type_builder = dynamic_cast<BuilderType *>(builder.get());
     ARA_ASSERT(type_builder, "Cast to concrete builder failed");
@@ -60,16 +59,15 @@ struct UnionTypeVisitor : public arrow::TypeVisitor {
       auto type_scalar = std::dynamic_pointer_cast<ScalarType>(scalar);
       if (type_scalar->is_valid) {
         ARA_ASSERT_ARROW_OK((Append<Type, BuilderType, ScalarType>(
-                                 type_builder, type_scalar.get())),
-                             "Append scalar failed");
+                                type_builder, type_scalar.get())),
+                            "Append scalar failed");
       } else {
-        ARA_ASSERT_ARROW_OK(type_builder->AppendNull(),
-                             "Append scalar failed");
+        ARA_ASSERT_ARROW_OK(type_builder->AppendNull(), "Append scalar failed");
       }
     }
     std::shared_ptr<arrow::Array> array;
     ARA_ASSERT_ARROW_OK(type_builder->Finish(&array),
-                         "Build arrow array failed");
+                        "Build arrow array failed");
     cv = createArrowColumnVector(data_type, array);
     return arrow::Status::OK();
   }
@@ -178,7 +176,7 @@ std::shared_ptr<Fragment> doUnion(const Context &ctx, const Schema &schema,
     const auto &data_type = fragment->column(i)->dataType();
     UnionTypeVisitor visitor(data_type, set, i);
     ARA_ASSERT_ARROW_OK(data_type.arrow()->Accept(&visitor),
-                         "Copy row from set failed");
+                        "Copy row from set failed");
     converged_columns.emplace_back(std::move(visitor.cv));
   }
 

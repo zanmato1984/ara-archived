@@ -120,7 +120,7 @@ struct DataTypeTypeVisitor : public arrow::TypeVisitor {
 TypeId fromArrowType(std::shared_ptr<arrow::DataType> data_type) {
   DataTypeTypeVisitor visitor;
   ARA_ASSERT_ARROW_OK(data_type->Accept(&visitor),
-                       "Get type ID from arrow data type failed");
+                      "Get type ID from arrow data type failed");
   return visitor.type_id;
 }
 

@@ -102,7 +102,7 @@ PipelineGenerator::genPipelines(const std::shared_ptr<const Rel> &rel) && {
   auto kernel = visit(rel);
   auto it = pipeline_chains.find(kernel);
   ARA_ASSERT(it != pipeline_chains.end(),
-              "Couldn't find kernel for rel node: " + rel->toString());
+             "Couldn't find kernel for rel node: " + rel->toString());
   auto &pipeline_chain = it->second;
   std::reverse(pipeline_chain.closed_pipelines.begin(),
                pipeline_chain.closed_pipelines.end());
@@ -110,7 +110,7 @@ PipelineGenerator::genPipelines(const std::shared_ptr<const Rel> &rel) && {
   std::list<std::unique_ptr<Pipeline>> pipelines;
   for (auto &pipeline : pipeline_chain.closed_pipelines) {
     ARA_ASSERT(!pipeline.non_streams.empty(),
-                "Closed pipeline with no non-stream kernel");
+               "Closed pipeline with no non-stream kernel");
     auto terminal = makeKernel<Terminal>(std::move(pipeline.non_streams));
     pipelines.emplace_back(std::make_unique<Pipeline>(
         pipelines.size(), false, std::move(pipeline.sources), terminal));
@@ -171,7 +171,7 @@ std::shared_ptr<Kernel> PipelineGenerator::visitHashJoinProbe(
     const std::vector<std::shared_ptr<Kernel>> &children) {
   auto it = hash_join_build_kernels.find(hash_join_probe->buildInput());
   ARA_ASSERT(it != hash_join_build_kernels.end(),
-              "Corresponding hash join build kernel not found");
+             "Corresponding hash join build kernel not found");
   std::vector<ColumnIdx> keys;
   for (const auto &key : hash_join_probe->probeKeys()) {
     keys.emplace_back(key->columnIdx());
@@ -209,7 +209,7 @@ std::shared_ptr<Kernel> PipelineGenerator::visitAggregate(
         auto col_ref = std::dynamic_pointer_cast<const ColumnRef>(
             aggregation->operands()[0]);
         ARA_ASSERT(col_ref,
-                    "Aggregate aggregation must be applied to ColumnRef");
+                   "Aggregate aggregation must be applied to ColumnRef");
         int64_t n = 0;
         if (auto nth_element =
                 std::dynamic_pointer_cast<const NthElement>(aggregation);
@@ -271,7 +271,7 @@ std::shared_ptr<Kernel> PipelineGenerator::combineResult(
     if (auto stream = std::dynamic_pointer_cast<StreamKernel>(child); stream) {
       auto non_terminal = std::dynamic_pointer_cast<NonTerminalKernel>(parent);
       ARA_ASSERT(non_terminal,
-                  "Meet terminal kernel during pipeline generation");
+                 "Meet terminal kernel during pipeline generation");
       stream->downstream = non_terminal;
     }
 
@@ -296,9 +296,9 @@ std::shared_ptr<Kernel> PipelineGenerator::combineResult(
                  std::dynamic_pointer_cast<NonStreamKernel>(parent);
              non_stream) {
     ARA_ASSERT(parent_pipeline_chain.open_pipeline,
-                "Dangling non-stream kernel");
+               "Dangling non-stream kernel");
     ARA_ASSERT(parent_pipeline_chain.open_pipeline.value().non_streams.empty(),
-                "Open pipeline contains non-stream kernels");
+               "Open pipeline contains non-stream kernels");
 
     parent_pipeline_chain.open_pipeline.value().non_streams.emplace_back(
         non_stream);

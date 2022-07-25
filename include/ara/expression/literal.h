@@ -56,8 +56,8 @@ template <typename T, typename Enable = void> struct GetValueScalarVisitor {
   }
 
   template <typename ScalarType,
-            std::enable_if_t<std::is_same_v<ScalarType, arrow::NullScalar>>
-                * = nullptr>
+            std::enable_if_t<std::is_same_v<ScalarType, arrow::NullScalar>> * =
+                nullptr>
   arrow::Status Visit(const ScalarType &scalar) {
     return arrow::Status::NotImplemented(
         "GetValueScalarVisitor not implemented for " + scalar.ToString());
@@ -107,8 +107,8 @@ struct Literal : public Expression {
   explicit Literal(TypeId type_id, T &&value) : data_type(type_id, false) {
     scalar = detail::createScalar(data_type.arrow(), std::forward<T>(value));
     ARA_ASSERT(data_type.arrow()->Equals(scalar->type),
-                "Mismatched ara and arrow data types " + data_type.toString() +
-                    " vs " + DataType(scalar->type, false).toString());
+               "Mismatched ara and arrow data types " + data_type.toString() +
+                   " vs " + DataType(scalar->type, false).toString());
   }
 
   const DataType &dataType() const override { return data_type; }
@@ -124,7 +124,7 @@ struct Literal : public Expression {
   template <typename T> T value() const {
     detail::GetValueScalarVisitor<T> visitor;
     ARA_ASSERT_ARROW_OK(arrow::VisitScalarInline(*scalar, &visitor),
-                         "Get arrow value from literal failed")
+                        "Get arrow value from literal failed")
     return visitor.value;
   }
 

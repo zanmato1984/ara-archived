@@ -7,7 +7,7 @@ void StreamKernel::push(const Context &ctx, ThreadId thread_id,
                         KernelId upstream,
                         std::shared_ptr<const Fragment> fragment) const {
   ARA_ASSERT(downstream, "push is not allowed for " + name() +
-                              " kernel without a downstream");
+                             " kernel without a downstream");
   auto result = pushImpl(ctx, thread_id, upstream, fragment);
   if (result) {
     downstream->push(ctx, thread_id, id, result);

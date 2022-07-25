@@ -13,8 +13,6 @@ Literal::evaluate(const Context &ctx, ThreadId thread_id,
   return createArrowColumnScalar(data_type, fragment.size(), scalar);
 }
 
-std::string Literal::toString() const {
-  return scalar->ToString();
-}
+std::string Literal::toString() const { return scalar->ToString(); }
 
 } // namespace ara::expression

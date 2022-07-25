@@ -19,8 +19,7 @@ BucketAggregate::BucketAggregate(KernelId id, Schema input_schema_,
                                  size_t buckets_)
     : HeapNonStreamKernel(id), input_schema(std::move(input_schema_)),
       output_schema(std::move(output_schema_)), keys(std::move(keys_)),
-      aggregations(std::move(aggregations_)), buckets(buckets_)
-{
+      aggregations(std::move(aggregations_)), buckets(buckets_) {
   ARA_ASSERT(!aggregations.empty(), "Empty aggregations for BucketAggregate");
 }
 
@@ -31,8 +30,7 @@ void BucketAggregate::push(const Context &ctx, ThreadId thread_id,
   pushed_fragments.emplace_back(fragment);
 }
 
-void BucketAggregate::concatenate(const Context &ctx) const {
-}
+void BucketAggregate::concatenate(const Context &ctx) const {}
 
 void BucketAggregate::converge(const Context &ctx) const {
   if (!concatenated_fragment) {

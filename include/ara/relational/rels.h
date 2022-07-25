@@ -91,7 +91,7 @@ struct RelUnion : public Rel {
                   [&schema](const auto &input) {
                     ARA_ASSERT(input, "Invalid RelUnion input");
                     ARA_ASSERT(input->output() == schema,
-                                "Mismatched RelUnion input schema");
+                               "Mismatched RelUnion input schema");
                   });
   }
 
@@ -110,7 +110,7 @@ struct RelUnionAll : public Rel {
                   [&schema](const auto &input) {
                     ARA_ASSERT(input, "Invalid RelUnionAll input");
                     ARA_ASSERT(input->output() == schema,
-                                "Mismatched RelUnionAll input schema");
+                               "Mismatched RelUnionAll input schema");
                   });
   }
 
@@ -141,7 +141,7 @@ inline std::string joinTypeToString(JoinType join_type) {
     APPLY_FOR_JOIN_TYPES(JOIN_TYPE_CASE);
   default:
     ARA_FAIL("Unknown join type " +
-              std::to_string(static_cast<int32_t>(join_type)));
+             std::to_string(static_cast<int32_t>(join_type)));
   }
 
 #undef JOIN_TYPE_CASE
@@ -149,7 +149,7 @@ inline std::string joinTypeToString(JoinType join_type) {
 
 inline JoinType joinTypeFromString(const std::string &s) {
 #define JOIN_TYPE_CASE(TYPE)                                                   \
-  if (s == ARA_STRINGIFY(TYPE)) {                                             \
+  if (s == ARA_STRINGIFY(TYPE)) {                                              \
     return JoinType::TYPE;                                                     \
   }
 
@@ -272,7 +272,7 @@ struct RelHashJoinProbe : public Rel {
         schema(std::move(schema_)), build_side(build_side_) {
     ARA_ASSERT(inputs[0], "Invalid probe side of RelHashJoinProbe");
     ARA_ASSERT(std::dynamic_pointer_cast<const RelHashJoinBuild>(inputs[1]),
-                "Invalid build side of RelHashJoinProbe");
+               "Invalid build side of RelHashJoinProbe");
     ARA_ASSERT(!keys.empty(), "Empty keys for RelHashJoinProbe");
   }
 

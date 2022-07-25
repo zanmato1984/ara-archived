@@ -38,10 +38,10 @@ void validateExpression(const Schema &input_schema,
   std::for_each(column_refs.begin(), column_refs.end(),
                 [&input_schema](const auto &column_ref) {
                   ARA_ASSERT(column_ref->columnIdx() < input_schema.size(),
-                              "Column ref out of bound");
+                             "Column ref out of bound");
                   ARA_ASSERT(column_ref->dataType() ==
-                                  input_schema[column_ref->columnIdx()],
-                              "Column ref data type mismatch with column");
+                                 input_schema[column_ref->columnIdx()],
+                             "Column ref data type mismatch with column");
                 });
 }
 

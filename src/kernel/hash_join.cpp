@@ -65,13 +65,13 @@ struct HashJoinImpl {
           probe_fragment->arrow(), indices.first,
           arrow::compute::TakeOptions::Defaults(), &context));
       ARA_ASSERT(probe_datum.kind() == arrow::Datum::RECORD_BATCH,
-                  "Invalid result for join take");
+                 "Invalid result for join take");
       const auto &probe_rb = probe_datum.record_batch();
       const auto &build_datum = ARA_GET_ARROW_RESULT(arrow::compute::Take(
           build_fragment->arrow(), indices.second,
           arrow::compute::TakeOptions::Defaults(), &context));
       ARA_ASSERT(build_datum.kind() == arrow::Datum::RECORD_BATCH,
-                  "Invalid result for join take");
+                 "Invalid result for join take");
       const auto &build_rb = build_datum.record_batch();
       arrow::SchemaBuilder builder;
       for (const auto &data_type : schema) {
@@ -119,9 +119,9 @@ private:
     auto build_indices_builder =
         dynamic_cast<arrow::UInt64Builder *>(build_builder.get());
     ARA_ASSERT(probe_indices_builder,
-                "Dynamic cast of probe indices builder failed");
+               "Dynamic cast of probe indices builder failed");
     ARA_ASSERT(build_indices_builder,
-                "Dynamic cast of build indices builder failed");
+               "Dynamic cast of build indices builder failed");
 
     auto rows = probe_keys.front()->size();
     for (size_t i = 0; i < rows; i++) {
@@ -133,16 +133,15 @@ private:
       auto pair = hash_table.equal_range(key);
       if (pair.first == pair.second && join_type == JoinType::LEFT) {
         ARA_ASSERT_ARROW_OK(probe_indices_builder->Append(i),
-                             "Append probe indices failed");
+                            "Append probe indices failed");
         ARA_ASSERT_ARROW_OK(build_indices_builder->AppendNull(),
-                             "Append build indices failed");
+                            "Append build indices failed");
       } else {
         while (pair.first != pair.second) {
           ARA_ASSERT_ARROW_OK(probe_indices_builder->Append(i),
-                               "Append probe indices failed");
-          ARA_ASSERT_ARROW_OK(
-              build_indices_builder->Append(pair.first->second),
-              "Append build indices failed");
+                              "Append probe indices failed");
+          ARA_ASSERT_ARROW_OK(build_indices_builder->Append(pair.first->second),
+                              "Append build indices failed");
           pair.first++;
         }
       }
@@ -150,9 +149,9 @@ private:
 
     std::shared_ptr<arrow::Array> probe_indices, build_indices;
     ARA_ASSERT_ARROW_OK(probe_indices_builder->Finish(&probe_indices),
-                         "Finish probe indices failed");
+                        "Finish probe indices failed");
     ARA_ASSERT_ARROW_OK(build_indices_builder->Finish(&build_indices),
-                         "Finish build indices failed");
+                        "Finish build indices failed");
 
     return std::make_pair(probe_indices, build_indices);
   }

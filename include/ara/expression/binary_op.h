@@ -5,39 +5,30 @@
 namespace ara::expression {
 
 #define APPLY_FOR_BINARY_OPERATORS(ACTION)                                     \
-  ACTION(ADD, +)                                                               \
-  ACTION(SUB, -)                                                               \
-  ACTION(MUL, *)                                                               \
-  ACTION(DIV, /)                                                               \
-  ACTION(TRUE_DIV, /)                                                          \
-  ACTION(FLOOR_DIV, /)                                                         \
-  ACTION(MOD, %)                                                               \
-  ACTION(PYMOD, %)                                                             \
-  ACTION(POW, )                                                                \
-  ACTION(EQUAL, =)                                                             \
-  ACTION(NOT_EQUAL, !=)                                                        \
-  ACTION(LESS, <)                                                              \
-  ACTION(GREATER, >)                                                           \
-  ACTION(LESS_EQUAL, <=)                                                       \
-  ACTION(GREATER_EQUAL, >=)                                                    \
-  ACTION(BITWISE_AND, &)                                                       \
-  ACTION(BITWISE_OR, |)                                                        \
-  ACTION(BITWISE_XOR, ^)                                                       \
-  ACTION(LOGICAL_AND, &&)                                                      \
-  ACTION(LOGICAL_OR, ||)                                                       \
-  ACTION(COALESCE, )                                                           \
-  ACTION(GENERIC_BINARY, )                                                     \
-  ACTION(SHIFT_LEFT, <<)                                                       \
-  ACTION(SHIFT_RIGHT, >>)                                                      \
-  ACTION(SHIFT_RIGHT_UNSIGNED, >>)                                             \
-  ACTION(LOG_BASE, )                                                           \
-  ACTION(ATAN2, )                                                              \
-  ACTION(PMOD, %)                                                              \
-  ACTION(NULL_EQUALS, ==)                                                      \
-  ACTION(NULL_MAX, )                                                           \
-  ACTION(NULL_MIN, )
+  ACTION(ADD, +, add)                                                          \
+  ACTION(SUB, -, substract)                                                    \
+  ACTION(MUL, *, multiply)                                                     \
+  ACTION(DIV, /, divide)                                                       \
+  ACTION(MOD, %, mod)                                                          \
+  ACTION(POW, ^, power)                                                        \
+  ACTION(EQUAL, =, equal)                                                      \
+  ACTION(NOT_EQUAL, !=, not_equal)                                             \
+  ACTION(LESS, <, less)                                                        \
+  ACTION(GREATER, >, greater)                                                  \
+  ACTION(LESS_EQUAL, <=, less_equal)                                           \
+  ACTION(GREATER_EQUAL, >=, greater_equal)                                     \
+  ACTION(BITWISE_AND, &, bit_wise_and)                                         \
+  ACTION(BITWISE_OR, |, bit_wise_or)                                           \
+  ACTION(BITWISE_XOR, ^, bit_wise_xor)                                         \
+  ACTION(LOGICAL_AND, &&, and_kleene)                                          \
+  ACTION(LOGICAL_OR, ||, or_kleene)                                            \
+  ACTION(COALESCE, coalesce, coalesce)                                         \
+  ACTION(SHIFT_LEFT, <<, shift_left)                                           \
+  ACTION(SHIFT_RIGHT, >>, shift_right)                                         \
+  ACTION(LOG_BASE, log, logb)                                                  \
+  ACTION(ATAN2, atan2, atan2)
 
-#define DEF_BINARY_OPERATOR_ENUM(OP, PRETTY) OP,
+#define DEF_BINARY_OPERATOR_ENUM(OP, PRETTY, ARROW) OP,
 
 enum class BinaryOperator : int32_t {
   APPLY_FOR_BINARY_OPERATORS(DEF_BINARY_OPERATOR_ENUM)
@@ -46,7 +37,7 @@ enum class BinaryOperator : int32_t {
 #undef DEF_BINARY_OPERATOR_ENUM
 
 inline std::string binaryOperatorToString(BinaryOperator op) {
-#define BINARY_OP_CASE(OP, PRETTY)                                             \
+#define BINARY_OP_CASE(OP, PRETTY, ARROW)                                      \
   case BinaryOperator::OP:                                                     \
     return ARA_STRINGIFY(OP);
 
@@ -60,7 +51,7 @@ inline std::string binaryOperatorToString(BinaryOperator op) {
 }
 
 inline std::string binaryOperatorPretty(BinaryOperator op) {
-#define BINARY_OP_CASE(OP, PRETTY)                                             \
+#define BINARY_OP_CASE(OP, PRETTY, ARROW)                                      \
   case BinaryOperator::OP:                                                     \
     return ARA_STRINGIFY(PRETTY);
 
@@ -74,8 +65,8 @@ inline std::string binaryOperatorPretty(BinaryOperator op) {
 }
 
 inline BinaryOperator binaryOperatorFromString(const std::string &s) {
-#define BINARY_OP_CASE(OP, PRETTY)                                             \
-  if (s == ARA_STRINGIFY(OP)) {                                               \
+#define BINARY_OP_CASE(OP, PRETTY, ARROW)                                      \
+  if (s == ARA_STRINGIFY(OP)) {                                                \
     return BinaryOperator::OP;                                                 \
   }
 
