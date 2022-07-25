@@ -25,6 +25,7 @@ dispatchBinaryOperator(const Context &ctx, ThreadId thread_id,
 #define BINARY_OP_CASE(OP, PRETTY, ARROW)                                      \
   case BinaryOperator::OP:                                                     \
     return ARA_STRINGIFY(ARROW);
+
     switch (binary_operator) {
       APPLY_FOR_BINARY_OPERATORS(BINARY_OP_CASE);
     default:
