@@ -9,6 +9,8 @@
 #include <arrow/visitor.h>
 #include <sstream>
 
+#include <arrow/util/checked_cast.h>
+
 namespace ara::kernel::detail {
 
 using ara::data::Column;
@@ -19,189 +21,6 @@ using ara::expression::Literal;
 // TODO: Rewrite these shit in a mature arrow fashion, i.e., array data visitors
 // or so.
 using ara::data::createArrowColumnVector;
-
-struct AppendScalarTypeVisitor : public arrow::TypeVisitor {
-  explicit AppendScalarTypeVisitor(arrow::ArrayBuilder &builder_)
-      : builder(builder_) {}
-
-  template <typename ScalarType>
-  struct AppendBuilderTypeVisitor : public arrow::TypeVisitor {
-    explicit AppendBuilderTypeVisitor(arrow::ArrayBuilder &builder_,
-                                      std::shared_ptr<ScalarType> scalar_)
-        : builder(builder_), scalar(scalar_) {}
-
-    template <typename BuilderType,
-              typename CorrespondingScalarType = typename arrow::TypeTraits<
-                  typename BuilderType::TypeClass>::ScalarType>
-    auto Append() {
-      auto b = dynamic_cast<BuilderType *>(&builder);
-      ARA_ASSERT(b, "Cast to concrete builder failed");
-      if (scalar->is_valid) {
-        auto casted = ARA_GET_ARROW_RESULT(arrow::compute::Cast(
-            std::static_pointer_cast<arrow::Scalar>(scalar), builder.type()));
-        return b->Append(
-            std::dynamic_pointer_cast<CorrespondingScalarType>(casted.scalar())
-                ->value);
-      } else {
-        return b->AppendNull();
-      }
-    }
-
-    arrow::Status Visit(const arrow::BooleanType &type) {
-      return Append<arrow::BooleanBuilder>();
-    }
-
-    arrow::Status Visit(const arrow::Int8Type &type) {
-      return Append<arrow::Int8Builder>();
-    }
-
-    arrow::Status Visit(const arrow::Int16Type &type) {
-      return Append<arrow::Int16Builder>();
-    }
-
-    arrow::Status Visit(const arrow::Int32Type &type) {
-      return Append<arrow::Int32Builder>();
-    }
-
-    arrow::Status Visit(const arrow::Int64Type &type) {
-      return Append<arrow::Int64Builder>();
-    }
-
-    arrow::Status Visit(const arrow::UInt8Type &type) {
-      return Append<arrow::UInt8Builder>();
-    }
-
-    arrow::Status Visit(const arrow::UInt16Type &type) {
-      return Append<arrow::UInt16Builder>();
-    }
-
-    arrow::Status Visit(const arrow::UInt32Type &type) {
-      return Append<arrow::UInt32Builder>();
-    }
-
-    arrow::Status Visit(const arrow::UInt64Type &type) {
-      return Append<arrow::UInt64Builder>();
-    }
-
-    arrow::Status Visit(const arrow::FloatType &type) {
-      return Append<arrow::FloatBuilder>();
-    }
-
-    arrow::Status Visit(const arrow::DoubleType &type) {
-      return Append<arrow::DoubleBuilder>();
-    }
-
-    arrow::Status Visit(const arrow::Date32Type &type) {
-      return Append<arrow::Date32Builder>();
-    }
-
-    arrow::Status Visit(const arrow::TimestampType &type) {
-      return Append<arrow::TimestampBuilder>();
-    }
-
-    arrow::Status Visit(const arrow::DurationType &type) {
-      return Append<arrow::DurationBuilder>();
-    }
-
-    template <typename T> arrow::Status Visit(const T &type) {
-      return arrow::Status::NotImplemented(
-          "AppendBuilderTypeVisitor not implemented for " +
-          builder.type()->ToString() + ": " + scalar->ToString());
-    }
-
-    arrow::ArrayBuilder &builder;
-    std::shared_ptr<ScalarType> scalar;
-  };
-
-  template <typename ScalarType,
-            std::enable_if_t<!std::is_same_v<ScalarType, arrow::StringScalar>>
-                * = nullptr>
-  auto Append() {
-    AppendBuilderTypeVisitor visitor(
-        builder, std::dynamic_pointer_cast<ScalarType>(scalar));
-    return arrow::VisitTypeInline(*builder.type(), &visitor);
-  }
-
-  auto Append(std::shared_ptr<arrow::StringScalar> string_scalar) {
-    auto b = dynamic_cast<arrow::StringBuilder *>(&builder);
-    ARA_ASSERT(b, "Cast to concrete builder failed");
-    if (scalar->is_valid) {
-      return b->Append(
-          static_cast<arrow::util::string_view>(*string_scalar->value));
-    } else {
-      return b->AppendNull();
-    }
-  }
-
-  arrow::Status Visit(const arrow::BooleanType &type) {
-    return Append<arrow::BooleanScalar>();
-  }
-
-  arrow::Status Visit(const arrow::Int8Type &type) {
-    return Append<arrow::Int8Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::Int16Type &type) {
-    return Append<arrow::Int16Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::Int32Type &type) {
-    return Append<arrow::Int32Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::Int64Type &type) {
-    return Append<arrow::Int64Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::UInt8Type &type) {
-    return Append<arrow::UInt8Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::UInt16Type &type) {
-    return Append<arrow::UInt16Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::UInt32Type &type) {
-    return Append<arrow::UInt32Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::UInt64Type &type) {
-    return Append<arrow::UInt64Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::FloatType &type) {
-    return Append<arrow::FloatScalar>();
-  }
-
-  arrow::Status Visit(const arrow::DoubleType &type) {
-    return Append<arrow::DoubleScalar>();
-  }
-
-  arrow::Status Visit(const arrow::StringType &type) {
-    return Append(std::dynamic_pointer_cast<arrow::StringScalar>(scalar));
-  }
-
-  arrow::Status Visit(const arrow::Date32Type &type) {
-    return Append<arrow::Date32Scalar>();
-  }
-
-  arrow::Status Visit(const arrow::TimestampType &type) {
-    return Append<arrow::TimestampScalar>();
-  }
-
-  arrow::Status Visit(const arrow::DurationType &type) {
-    return Append<arrow::DurationScalar>();
-  }
-
-  template <typename T> arrow::Status Visit(const T &type) {
-    return arrow::Status::NotImplemented(
-        "AppendScalarTypeVisitor not implemented for " +
-        builder.type()->ToString() + ": " + scalar->ToString());
-  }
-
-  arrow::ArrayBuilder &builder;
-  std::shared_ptr<arrow::Scalar> scalar;
-};
 
 std::shared_ptr<arrow::Scalar> dispatchAggregationOperatorColumnVector(
     const Context &ctx, std::shared_ptr<arrow::Array> column,
@@ -299,6 +118,105 @@ doAggregateWithoutKey(const Context &ctx, const Schema &schema,
   return std::make_shared<Fragment>(std::move(results));
 }
 
+arrow::compute::Aggregate toArrowAggregate(const PhysicalAggregation &agg) {
+  switch (agg.op) {
+    case AggregationOperator::SUM: return {"hash_sum"};
+    case AggregationOperator::PRODUCT: return {"hash_product"};
+    case AggregationOperator::MIN: return {"hash_min"};
+    case AggregationOperator::MAX: return {"hash_max"};
+    case AggregationOperator::COUNT_VALID: return {"hash_count", std::make_shared<arrow::compute::CountOptions>(arrow::compute::CountOptions::ALL)};
+    case AggregationOperator::COUNT_ALL: return {"hash_count", std::make_shared<arrow::compute::CountOptions>(arrow::compute::CountOptions::ONLY_VALID)};
+    case AggregationOperator::ANY:
+    case AggregationOperator::ALL:
+    case AggregationOperator::SUM_OF_SQUARES:
+    case AggregationOperator::MEAN:
+    case AggregationOperator::MEDIAN:
+    case AggregationOperator::QUANTILE:
+    case AggregationOperator::ARGMAX:
+    case AggregationOperator::ARGMIN:
+    case AggregationOperator::NUNIQUE:
+    case AggregationOperator::NTH_ELEMENT: return {};
+  }
+}
+
+arrow::Result<std::vector<const arrow::compute::HashAggregateKernel*>> GetKernels(
+    arrow::compute::ExecContext* ctx, const std::vector<arrow::compute::Aggregate>& aggregates,
+    const std::vector<arrow::TypeHolder>& in_types) {
+  if (aggregates.size() != in_types.size()) {
+    return arrow::Status::Invalid(aggregates.size(), " aggregate functions were specified but ",
+                           in_types.size(), " arguments were provided.");
+  }
+
+  std::vector<const arrow::compute::HashAggregateKernel*> kernels(in_types.size());
+
+  for (size_t i = 0; i < aggregates.size(); ++i) {
+    ARROW_ASSIGN_OR_RAISE(auto function,
+                          ctx->func_registry()->GetFunction(aggregates[i].function));
+    ARROW_ASSIGN_OR_RAISE(const arrow::compute::Kernel* kernel,
+                          function->DispatchExact({in_types[i], arrow::uint32()}));
+    kernels[i] = static_cast<const arrow::compute::HashAggregateKernel*>(kernel);
+  }
+  return kernels;
+}
+
+arrow::Result<std::vector<std::unique_ptr<arrow::compute::KernelState>>> InitKernels(
+    const std::vector<const arrow::compute::HashAggregateKernel*>& kernels, arrow::compute::ExecContext* ctx,
+    const std::vector<arrow::compute::Aggregate>& aggregates, const std::vector<arrow::TypeHolder>& in_types) {
+  std::vector<std::unique_ptr<arrow::compute::KernelState>> states(kernels.size());
+
+  for (size_t i = 0; i < aggregates.size(); ++i) {
+    const arrow::compute::FunctionOptions* options =
+        arrow::internal::checked_cast<const arrow::compute::FunctionOptions*>(
+            aggregates[i].options.get());
+
+    if (options == nullptr) {
+      // use known default options for the named function if possible
+      auto maybe_function = ctx->func_registry()->GetFunction(aggregates[i].function);
+      if (maybe_function.ok()) {
+        options = maybe_function.ValueOrDie()->default_options();
+      }
+    }
+
+    arrow::compute::KernelContext kernel_ctx{ctx};
+    ARROW_ASSIGN_OR_RAISE(states[i],
+                          kernels[i]->init(&kernel_ctx, arrow::compute::KernelInitArgs{kernels[i],
+                                                                                       {
+                                                                                           in_types[i],
+                                                                                           arrow::uint32(),
+                                                                                       },
+                                                                                       options}));
+  }
+
+  return std::move(states);
+}
+
+arrow::Result<arrow::FieldVector> ResolveKernels(
+    const std::vector<arrow::compute::Aggregate>& aggregates,
+    const std::vector<const arrow::compute::HashAggregateKernel*>& kernels,
+    const std::vector<std::unique_ptr<arrow::compute::KernelState>>& states, arrow::compute::ExecContext* ctx,
+    const std::vector<arrow::TypeHolder>& types) {
+  arrow::FieldVector fields(types.size());
+
+  for (size_t i = 0; i < kernels.size(); ++i) {
+    arrow::compute::KernelContext kernel_ctx{ctx};
+    kernel_ctx.SetState(states[i].get());
+
+    ARROW_ASSIGN_OR_RAISE(auto type, kernels[i]->signature->out_type().Resolve(
+        &kernel_ctx, {types[i], arrow::uint32()}));
+    fields[i] = field(aggregates[i].function, type.GetSharedPtr());
+  }
+  return fields;
+}
+
+arrow::Result<arrow::compute::ExecBatch> toExecBatch(std::shared_ptr<const Fragment> fragment, const std::vector<ColumnIdx> &indices) {
+  std::vector<arrow::Datum> cols;
+  cols.reserve(indices.size());
+  for (auto idx : indices) {
+    cols.emplace_back(fragment->column(idx)->arrow());
+  }
+  return arrow::compute::ExecBatch::Make(std::move(cols));
+}
+
 std::shared_ptr<Fragment>
 doAggregate(const Context &ctx, const Schema &schema,
             const std::vector<ColumnIdx> &keys,
@@ -312,87 +230,70 @@ doAggregate(const Context &ctx, const Schema &schema,
   auto pool = ctx.memory_resource->converge();
   arrow::compute::ExecContext context(pool);
 
-  using Indices = std::pair<std::unique_ptr<arrow::ArrayBuilder>,
-                            std::shared_ptr<arrow::Array>>;
-  using IndicesHashTable = std::unordered_map<Key, Indices, RowHash, RowEqual>;
-  IndicesHashTable indices;
-  std::vector<std::shared_ptr<const Column>> results;
+  std::vector<ColumnIdx> agg_cols(aggregations.size());
+  std::transform(
+      aggregations.begin(), aggregations.end(), agg_cols.begin(),
+      [](const auto &agg) { return agg.idx; });
 
-  /// Build hash table for group keys and record the grouped indices.
-  {
-    auto rows = fragment->size();
-    for (size_t i = 0; i < rows; i++) {
-      Key key_values;
-      for (auto key : keys) {
-        const auto &key_col = fragment->column(key);
-        const auto &value =
-            ARA_GET_ARROW_RESULT(key_col->arrow()->GetScalar(i));
-        key_values.emplace_back(value);
-      }
-      auto it = indices.find(key_values);
-      if (it == indices.end()) {
-        std::unique_ptr<arrow::ArrayBuilder> builder;
-        ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, arrow::uint64(), &builder),
-                            "Create indices builder failed");
-        std::tie(it, std::ignore) = indices.emplace(
-            std::move(key_values), std::make_pair(std::move(builder), nullptr));
-      }
-      auto indices_builder =
-          dynamic_cast<arrow::UInt64Builder *>(it->second.first.get());
-      ARA_ASSERT_ARROW_OK(indices_builder->Append(i), "Append index failed");
-    }
-    for (auto &entry : indices) {
-      ARA_ASSERT_ARROW_OK(entry.second.first->Finish(&entry.second.second),
-                          "Finish indices failed");
-    }
+  std::vector<arrow::compute::Aggregate> aggs(aggregations.size());
+  std::transform(aggregations.begin(), aggregations.end(), aggs.begin(), [](const auto &agg) { return toArrowAggregate(agg); });
+
+  const auto &agg_eb = ARA_GET_ARROW_RESULT(toExecBatch(fragment, agg_cols));
+  const auto agg_types = agg_eb.GetTypes();
+
+  const auto &kernels = ARA_GET_ARROW_RESULT(GetKernels(&context, aggs, agg_types));
+
+  const auto &states = ARA_GET_ARROW_RESULT(InitKernels(kernels, &context, aggs, agg_types));
+
+  const auto &out_fields = ARA_GET_ARROW_RESULT(ResolveKernels(aggs, kernels, states, &context, agg_types));
+
+  const auto &key_eb = ARA_GET_ARROW_RESULT(toExecBatch(fragment, keys));
+  const auto key_types = key_eb.GetTypes();
+
+  const auto &grouper = ARA_GET_ARROW_RESULT(arrow::compute::Grouper::Make(key_types));
+
+  const auto id_batch = grouper->Consume(arrow::compute::ExecSpan{key_eb});
+  // consume group ids with HashAggregateKernels
+  for (size_t i = 0; i < kernels.size(); ++i) {
+    arrow::compute::KernelContext batch_ctx{&context};
+    batch_ctx.SetState(states[i].get());
+    arrow::compute::ExecSpan agg_es(agg_eb);
+    arrow::compute::ExecSpan kernel_batch({agg_es[i], *id_batch->array()}, agg_es.length);
+    ARA_ASSERT_ARROW_OK(kernels[i]->resize(&batch_ctx, grouper->num_groups()), "Aggregate kernel resize failed");
+    ARA_ASSERT_ARROW_OK(kernels[i]->consume(&batch_ctx, kernel_batch), "Aggregate kernel consume failed");
   }
 
-  /// Gather group columns based on groups.
-  {
-    for (size_t i = 0; i < keys.size(); i++) {
-      std::unique_ptr<arrow::ArrayBuilder> builder;
-      ARA_ASSERT_ARROW_OK(arrow::MakeBuilder(pool, schema[i].arrow(), &builder),
-                          "Create group builder failed");
-      AppendScalarTypeVisitor visitor(*builder);
-      for (const auto &entry : indices) {
-        visitor.scalar = entry.first[i];
-        ARA_ASSERT_ARROW_OK(
-            arrow::VisitTypeInline(*entry.first[i]->type, &visitor),
-            "Gather group scalar failed");
-      }
-      std::shared_ptr<arrow::Array> array;
-      ARA_ASSERT_ARROW_OK(builder->Finish(&array), "Finish group failed");
-      results.emplace_back(createArrowColumnVector(schema[i], array));
-    }
+  // Finalize output
+  arrow::ArrayDataVector out_data(aggregations.size() + keys.size());
+  auto it = out_data.begin();
+
+  const auto &out_keys = ARA_GET_ARROW_RESULT(grouper->GetUniques());
+  for (const auto& key : out_keys.values) {
+    *it++ = key.array();
   }
 
-  /// Gather aggregation columns based on grouped indices.
-  {
-    for (const auto &aggregation : aggregations) {
-      std::unique_ptr<arrow::ArrayBuilder> builder;
-      ARA_ASSERT_ARROW_OK(
-          arrow::MakeBuilder(pool, aggregation.data_type.arrow(), &builder),
-          "Create aggregation builder failed");
-      AppendScalarTypeVisitor visitor(*builder);
-      for (const auto &entry : indices) {
-        const auto &datum = ARA_GET_ARROW_RESULT(arrow::compute::Take(
-            fragment->column(aggregation.idx)->arrow(), entry.second.second,
-            arrow::compute::TakeOptions::Defaults(), &context));
-        const auto &array = datum.make_array();
-        auto scalar =
-            dispatchAggregationOperatorColumnVector(ctx, array, aggregation);
-        visitor.scalar = scalar;
-        ARA_ASSERT_ARROW_OK(arrow::VisitTypeInline(*scalar->type, &visitor),
-                            "Gather aggregation scalar failed");
-      }
-      std::shared_ptr<arrow::Array> array;
-      ARA_ASSERT_ARROW_OK(builder->Finish(&array), "Finish aggregation failed");
-      results.emplace_back(
-          createArrowColumnVector(aggregation.data_type, array));
-    }
+  for (size_t idx = 0; idx < kernels.size(); ++idx) {
+    arrow::compute::KernelContext batch_ctx{&context};
+    batch_ctx.SetState(states[idx].get());
+    arrow::Datum out;
+    ARA_ASSERT_ARROW_OK(kernels[idx]->finalize(&batch_ctx, &out), "Aggregate kernel finalize failed");
+    *it++ = out.array();
   }
 
-  return std::make_shared<Fragment>(std::move(results));
+  int64_t length = out_data[0]->length;
+
+  arrow::SchemaBuilder builder;
+  std::vector<std::shared_ptr<arrow::Array>> arrays;
+  for (size_t i = 0; i < schema.size(); i++) {
+    const auto &data_type = schema[i];
+    auto field = std::make_shared<arrow::Field>("", data_type.arrow(),
+                                                data_type.nullable);
+    ARA_ASSERT_ARROW_OK(builder.AddField(field), "Add arrow field failed");
+  }
+  auto arrow_schema = ARA_GET_ARROW_RESULT(builder.Finish());
+
+  auto rb = arrow::RecordBatch::Make(arrow_schema, length, std::move(out_data));
+  return std::make_shared<Fragment>(std::move(rb));
 }
 
 } // namespace ara::kernel::detail

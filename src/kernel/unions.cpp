@@ -41,7 +41,7 @@ struct UnionTypeVisitor : public arrow::TypeVisitor {
       std::enable_if_t<std::is_same_v<Type, arrow::StringType>> * = nullptr>
   auto Append(BuilderType *builder, ScalarType *scalar) {
     return builder->Append(
-        static_cast<arrow::util::string_view>(*scalar->value));
+        static_cast<std::string_view>(*scalar->value));
   }
 
   template <typename Type, typename BuilderType, typename ScalarType>
