@@ -4,8 +4,32 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - aws-sdk-cpp=1.8.186
+  - benchmark>=1.6.0
+  - boost-cpp>=1.68.0
+  - brotli
+  - bzip2
+  - c-ares
   - cmake
-  - arrow-cpp=10.0
+  - flatbuffers
+  - gflags
+  - glog
+  - gmock=1.10.0
+  - google-cloud-cpp>=1.34.0
+  - grpc-cpp
+  - gtest=1.10.0
+  - libprotobuf
+  - libutf8proc
+  - lz4-c
+  - make
+  - ninja
+  - orc
+  - pkg-config
+  - python
   - rapidjson
-  - gtest
-  - gmock
+  - re2
+  - snappy
+  - thrift-cpp>=0.11.0
+  - xsimd
+  - zlib
+  - zstd
