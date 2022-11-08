@@ -259,11 +259,11 @@ TEST(ParserTest, BinaryOp) {
   }
   {
     auto json =
-        R"({"binary_op": "PMOD", "operands": [{"type": "INT64", "literal": 42}, {"col_ref": 0}], "type": {"type": "INT64", "nullable": true}})";
+        R"({"binary_op": "MOD", "operands": [{"type": "INT64", "literal": 42}, {"col_ref": 0}], "type": {"type": "INT64", "nullable": true}})";
     testExpression<BinaryOp>(
         json, [](std::shared_ptr<const BinaryOp> binary_op) {
           ASSERT_EQ(binary_op->dataType(), DataType::int64Type(true));
-          ASSERT_EQ(binary_op->binaryOperator(), BinaryOperator::PMOD);
+          ASSERT_EQ(binary_op->binaryOperator(), BinaryOperator::MOD);
         });
   }
 }
