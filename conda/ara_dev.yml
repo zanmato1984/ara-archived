@@ -1,10 +1,11 @@
 name: ara-dev
 channels:
+  - arrow-nightlies
   - conda-forge
   - defaults
 dependencies:
   - cmake
-  - arrow-cpp>=8.0
+  - arrow-cpp=10.0
   - rapidjson
   - gtest
   - gmock
